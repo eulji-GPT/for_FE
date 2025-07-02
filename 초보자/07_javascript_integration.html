@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript와 CSS 연동 - 인터랙티브 웹</title>
+    <style>
+        /* CSS 변수 정의 */
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --success-color: #00d2d3;
+            --warning-color: #ff9500;
+            --danger-color: #ff6b6b;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow: 0 5px 15px rgba(0,0,0,0.1);
+            --shadow-hover: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* 헤더 스타일 */
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 3px solid var(--primary-color);
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: var(--text-light);
+        }
+
+        /* 섹션 공통 스타일 */
+        .section {
+            margin-bottom: 50px;
+            padding: 30px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            color: var(--text-dark);
+            border-left: 5px solid var(--primary-color);
+            padding-left: 15px;
+            margin-bottom: 20px;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+        }
+
+        h3 {
+            color: var(--text-dark);
+            margin: 25px 0 15px 0;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+        }
+
+        /* 코드 블록 */
+        .code-block {
+            background: var(--text-dark);
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+        }
+
+        /* 예제 컨테이너 */
+        .demo-container {
+            border: 2px solid var(--primary-color);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: white;
+        }
+
+        /* 버튼 스타일 */
+        .btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--success-color), #00a8cc);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, var(--warning-color), #ff7b00);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, var(--danger-color), #ee5a52);
+        }
+
+        /* 애니메이션 클래스 */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.6s ease-out;
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        .shake {
+            animation: shake 0.6s ease-in-out;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            from { 
+                opacity: 0;
+                transform: translateX(-100px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from { 
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* 토글 스위치 */
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--success-color);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active::before {
+            transform: translateX(30px);
+        }
+
+        /* 프로그레스 바 */
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* 카드 플립 효과 */
+        .flip-card {
+            background-color: transparent;
+            width: 300px;
+            height: 200px;
+            perspective: 1000px;
+            margin: 20px auto;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .flip-card-front {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .flip-card-back {
+            background: linear-gradient(45deg, var(--accent-color), var(--success-color));
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        /* 탭 메뉴 */
+        .tab-container {
+            margin: 20px 0;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: var(--bg-light);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: var(--shadow-hover);
+            animation: bounceIn 0.5s ease-out;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--danger-color);
+        }
+
+        /* 드래그 앤 드롭 */
+        .drag-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .drag-area.drag-over {
+            border-color: var(--primary-color);
+            background: var(--bg-light);
+        }
+
+        /* 실시간 계산기 */
+        .calculator {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            max-width: 300px;
+        }
+
+        .calculator-display {
+            width: 100%;
+            height: 60px;
+            font-size: 1.5rem;
+            text-align: right;
+            padding: 0 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: var(--bg-light);
+        }
+
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calc-btn.number {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .calc-btn.operator {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .calc-btn.equals {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .calc-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* 다크 모드 */
+        body.dark-mode {
+            --text-dark: #ecf0f1;
+            --text-light: #bdc3c7;
+            --bg-light: #34495e;
+            --border-color: #5a6c7d;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+
+        body.dark-mode .container {
+            background: #2c3e50;
+            color: var(--text-dark);
+        }
+
+        body.dark-mode .demo-container,
+        body.dark-mode .tab-content,
+        body.dark-mode .calculator {
+            background: #34495e;
+            border-color: var(--border-color);
+        }
+
+        body.dark-mode .modal-content {
+            background: #34495e;
+            color: var(--text-dark);
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .flip-card {
+                width: 250px;
+                height: 150px;
+            }
+            
+            .tab-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .calculator {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>JavaScript와 CSS 연동</h1>
+            <p class="subtitle">인터랙티브하고 동적인 웹 페이지 만들기</p>
+            <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; border-radius: 8px;">
+                <p style="margin: 0; font-size: 1.1rem;"><strong>을지대학교 의료IT 안건</strong> 제작</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.95rem;">을GPT팀원을 위한 HTML/CSS/JavaScript 학습용 실습 파일</p>
+            </div>
+        </header>
+
+        <div class="section">
+            <h2>1. CSS 클래스 조작</h2>
+            <p>JavaScript로 CSS 클래스를 추가하고 제거하여 스타일을 동적으로 변경할 수 있습니다.</p>
+            
+            <div class="code-block">
+// 클래스 추가/제거
+element.classList.add('active');
+element.classList.remove('inactive');
+element.classList.toggle('hidden');
+
+// 조건부 클래스 적용
+if (condition) {
+    element.classList.add('success');
+} else {
+    element.classList.add('error');
+}
+            </div>
+
+            <div class="demo-container">
+                <h4>애니메이션 효과 테스트</h4>
+                <p>버튼을 클릭하여 다양한 CSS 애니메이션을 테스트해보세요!</p>
+                
+                <div>
+                    <button class="btn" onclick="animateBox('fade-in')">Fade In</button>
+                    <button class="btn" onclick="animateBox('slide-in-left')">Slide Left</button>
+                    <button class="btn" onclick="animateBox('slide-in-right')">Slide Right</button>
+                    <button class="btn" onclick="animateBox('bounce-in')">Bounce In</button>
+                    <button class="btn" onclick="animateBox('shake')">Shake</button>
+                </div>
+                
+                <div id="animationBox" style="width: 200px; height: 100px; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); margin: 20px auto; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                    애니메이션 박스
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2. 인터랙티브 컴포넌트</h2>
+            
+            <h3>토글 스위치</h3>
+            <div class="demo-container">
+                <p>다크 모드 전환:</p>
+                <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div>
+                <p id="darkModeStatus" style="margin-top: 10px; color: var(--text-light);">라이트 모드 활성</p>
+            </div>
+
+            <h3>프로그레스 바</h3>
+            <div class="demo-container">
+                <p>학습 진도율:</p>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div>
+                    <button class="btn" onclick="updateProgress(25)">25%</button>
+                    <button class="btn" onclick="updateProgress(50)">50%</button>
+                    <button class="btn" onclick="updateProgress(75)">75%</button>
+                    <button class="btn btn-success" onclick="updateProgress(100)">100%</button>
+                    <button class="btn btn-warning" onclick="updateProgress(0)">리셋</button>
+                </div>
+                <p id="progressText" style="margin-top: 10px; text-align: center; font-weight: bold;">0% 완료</p>
+            </div>
+
+            <h3>카드 플립</h3>
+            <div class="demo-container">
+                <p>카드를 클릭하여 뒤집어 보세요:</p>
+                <div class="flip-card" id="flipCard" onclick="flipCard()">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            안건의 프로필
+                        </div>
+                        <div class="flip-card-back">
+                            을지대 의료IT<br>
+                            Frontend Developer
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3. 탭 메뉴 시스템</h2>
+            <p>JavaScript로 구현하는 동적 탭 메뉴입니다.</p>
+            
+            <div class="code-block">
+function showTab(tabName) {
+    // 모든 탭 콘텐츠 숨기기
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    // 모든 탭 버튼 비활성화
+    const buttons = document.querySelectorAll('.tab-button');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    // 선택된 탭만 활성화
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+}
+            </div>
+
+            <div class="demo-container">
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="showTab('tab1')">HTML 기초</button>
+                        <button class="tab-button" onclick="showTab('tab2')">CSS 스타일링</button>
+                        <button class="tab-button" onclick="showTab('tab3')">JavaScript 활용</button>
+                        <button class="tab-button" onclick="showTab('tab4')">실전 프로젝트</button>
+                    </div>
+                    
+                    <div id="tab1" class="tab-content active">
+                        <h4>🏗️ HTML 기초</h4>
+                        <p><strong>안건</strong>이 배우고 있는 HTML 구조화:</p>
+                        <ul>
+                            <li>시맨틱 태그 활용</li>
+                            <li>접근성 고려한 마크업</li>
+                            <li>SEO 최적화 구조</li>
+                            <li>모던 HTML5 API</li>
+                        </ul>
+                    </div>
+                    
+                    <div id="tab2" class="tab-content">
+                        <h4>🎨 CSS 스타일링</h4>
+                        <p><strong>유진우</strong>가 마스터하고 있는 CSS 기법:</p>
+                        <ul>
+                            <li>Flexbox와 Grid 레이아웃</li>
+                            <li>CSS 변수와 커스텀 속성</li>
+                            <li>반응형 디자인 패턴</li>
+                            <li>고급 애니메이션 기법</li>
+                        </ul>
+                    </div>
+                    
+                    <div id="tab3" class="tab-content">
+                        <h4>⚡ JavaScript 활용</h4>
+                        <p>의료IT 전공생들이 배우는 JavaScript:</p>
+                        <ul>
+                            <li>DOM 조작과 이벤트 처리</li>
+                            <li>비동기 프로그래밍</li>
+                            <li>API 연동과 데이터 처리</li>
+                            <li>최신 ES6+ 문법</li>
+                        </ul>
+                    </div>
+                    
+                    <div id="tab4" class="tab-content">
+                        <h4>🚀 실전 프로젝트</h4>
+                        <p>의료IT 분야 웹 프로젝트:</p>
+                        <ul>
+                            <li>환자 정보 관리 시스템</li>
+                            <li>의료진 스케줄링 앱</li>
+                            <li>건강 데이터 시각화</li>
+                            <li>원격 진료 플랫폼</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>4. 모달과 팝업</h2>
+            <p>사용자 인터랙션을 위한 모달 창 구현입니다.</p>
+            
+            <div class="demo-container">
+                <button class="btn btn-success" onclick="showModal()">프로필 상세 보기</button>
+                <button class="btn btn-warning" onclick="showAlert()">알림 메시지</button>
+                <button class="btn btn-danger" onclick="showConfirm()">삭제 확인</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>5. 드래그 앤 드롭</h2>
+            <p>파일 업로드나 요소 이동을 위한 드래그 앤 드롭 기능입니다.</p>
+            
+            <div class="demo-container">
+                <div class="drag-area" id="dragArea">
+                    <p>📁 파일을 여기에 드래그하세요</p>
+                    <p style="font-size: 0.9rem; color: var(--text-light);">또는 클릭하여 파일 선택</p>
+                    <input type="file" id="fileInput" style="display: none;" multiple>
+                </div>
+                <div id="fileList" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>6. 실시간 계산기</h2>
+            <p>JavaScript로 구현하는 기본 계산기입니다.</p>
+            
+            <div class="demo-container">
+                <div class="calculator">
+                    <input type="text" class="calculator-display" id="calcDisplay" readonly>
+                    <div class="calculator-buttons">
+                        <button class="calc-btn operator" onclick="clearDisplay()">C</button>
+                        <button class="calc-btn operator" onclick="deleteLast()">⌫</button>
+                        <button class="calc-btn operator" onclick="appendToDisplay('/')">/</button>
+                        <button class="calc-btn operator" onclick="appendToDisplay('*')">×</button>
+                        
+                        <button class="calc-btn number" onclick="appendToDisplay('7')">7</button>
+                        <button class="calc-btn number" onclick="appendToDisplay('8')">8</button>
+                        <button class="calc-btn number" onclick="appendToDisplay('9')">9</button>
+                        <button class="calc-btn operator" onclick="appendToDisplay('-')">-</button>
+                        
+                        <button class="calc-btn number" onclick="appendToDisplay('4')">4</button>
+                        <button class="calc-btn number" onclick="appendToDisplay('5')">5</button>
+                        <button class="calc-btn number" onclick="appendToDisplay('6')">6</button>
+                        <button class="calc-btn operator" onclick="appendToDisplay('+')">+</button>
+                        
+                        <button class="calc-btn number" onclick="appendToDisplay('1')">1</button>
+                        <button class="calc-btn number" onclick="appendToDisplay('2')">2</button>
+                        <button class="calc-btn number" onclick="appendToDisplay('3')">3</button>
+                        <button class="calc-btn equals" onclick="calculateResult()" rowspan="2">=</button>
+                        
+                        <button class="calc-btn number" onclick="appendToDisplay('0')" style="grid-column: span 2;">0</button>
+                        <button class="calc-btn number" onclick="appendToDisplay('.')">.</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>7. 실시간 폼 유효성 검사</h2>
+            <p>사용자 입력을 실시간으로 검증하는 스마트 폼입니다.</p>
+            
+            <div class="demo-container">
+                <form id="smartForm" style="max-width: 500px;">
+                    <div style="margin-bottom: 20px;">
+                        <label>이름 (필수):</label>
+                        <input type="text" id="nameInput" placeholder="안건" style="width: 100%; padding: 10px; margin-top: 5px; border: 2px solid var(--border-color); border-radius: 5px;">
+                        <div id="nameError" style="color: var(--danger-color); font-size: 0.9rem; margin-top: 5px;"></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label>이메일:</label>
+                        <input type="email" id="emailInput" placeholder="geon0078@g.eulji.ac.kr" style="width: 100%; padding: 10px; margin-top: 5px; border: 2px solid var(--border-color); border-radius: 5px;">
+                        <div id="emailError" style="color: var(--danger-color); font-size: 0.9rem; margin-top: 5px;"></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label>전공:</label>
+                        <select id="majorSelect" style="width: 100%; padding: 10px; margin-top: 5px; border: 2px solid var(--border-color); border-radius: 5px;">
+                            <option value="">선택해주세요</option>
+                            <option value="의료IT">의료IT</option>
+                            <option value="보건의료정보">보건의료정보</option>
+                            <option value="의생명융합">의생명융합</option>
+                        </select>
+                        <div id="majorError" style="color: var(--danger-color); font-size: 0.9rem; margin-top: 5px;"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success" style="width: 100%;">등록하기</button>
+                </form>
+            </div>
+        </div>
+
+        <footer style="margin-top: 50px; text-align: center; color: var(--text-light); border-top: 1px solid var(--border-color); padding-top: 20px;">
+            <p>JavaScript와 CSS 연동 - 동적이고 인터랙티브한 웹 개발</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">
+                제작: 을지대학교 의료IT 안건 | 을GPT팀원 전용 학습 자료
+            </p>
+        </footer>
+    </div>
+
+    <!-- 모달 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="hideModal()">&times;</span>
+            <h3>👨‍💻 개발자 프로필</h3>
+            <div style="padding: 20px 0;">
+                <p><strong>이름:</strong> 안건</p>
+                <p><strong>전공:</strong> 의료IT</p>
+                <p><strong>이메일:</strong> geon0078@g.eulji.ac.kr</p>
+                <p><strong>관심분야:</strong> Frontend Development, UI/UX Design</p>
+                <p><strong>현재 학습:</strong> React, Vue.js, TypeScript</p>
+            </div>
+            <button class="btn" onclick="hideModal()">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        // 애니메이션 함수
+        function animateBox(animationClass) {
+            const box = document.getElementById('animationBox');
+            box.className = '';
+            setTimeout(() => {
+                box.classList.add(animationClass);
+            }, 10);
+        }
+
+        // 다크 모드 토글
+        function toggleDarkMode() {
+            const toggle = document.getElementById('darkModeToggle');
+            const status = document.getElementById('darkModeStatus');
+            
+            document.body.classList.toggle('dark-mode');
+            toggle.classList.toggle('active');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                status.textContent = '다크 모드 활성';
+            } else {
+                status.textContent = '라이트 모드 활성';
+            }
+        }
+
+        // 프로그레스 바 업데이트
+        function updateProgress(percentage) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = percentage + '% 완료';
+        }
+
+        // 카드 플립
+        function flipCard() {
+            const card = document.getElementById('flipCard');
+            card.classList.toggle('flipped');
+        }
+
+        // 탭 메뉴
+        function showTab(tabName) {
+            // 모든 탭 콘텐츠 숨기기
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // 모든 탭 버튼 비활성화
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // 선택된 탭만 활성화
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 모달 관련 함수
+        function showModal() {
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function hideModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        function showAlert() {
+            alert('🎉 을GPT팀원 여러분, 학습을 응원합니다!');
+        }
+
+        function showConfirm() {
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                alert('✅ 삭제가 완료되었습니다.');
+            } else {
+                alert('❌ 삭제가 취소되었습니다.');
+            }
+        }
+
+        // 드래그 앤 드롭
+        const dragArea = document.getElementById('dragArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+
+        dragArea.addEventListener('click', () => fileInput.click());
+
+        dragArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dragArea.classList.add('drag-over');
+        });
+
+        dragArea.addEventListener('dragleave', () => {
+            dragArea.classList.remove('drag-over');
+        });
+
+        dragArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragArea.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            fileList.innerHTML = '<h4>선택된 파일:</h4>';
+            Array.from(files).forEach(file => {
+                const fileDiv = document.createElement('div');
+                fileDiv.style.cssText = 'padding: 10px; margin: 5px 0; background: var(--bg-light); border-radius: 5px; border: 1px solid var(--border-color);';
+                fileDiv.innerHTML = `
+                    <strong>${file.name}</strong> 
+                    <span style="color: var(--text-light); font-size: 0.9rem;">
+                        (${(file.size / 1024).toFixed(1)} KB)
+                    </span>
+                `;
+                fileList.appendChild(fileDiv);
+            });
+        }
+
+        // 계산기
+        let calcDisplay = document.getElementById('calcDisplay');
+        let currentInput = '';
+        let operator = '';
+        let previousInput = '';
+
+        function appendToDisplay(value) {
+            calcDisplay.value += value;
+        }
+
+        function clearDisplay() {
+            calcDisplay.value = '';
+            currentInput = '';
+            operator = '';
+            previousInput = '';
+        }
+
+        function deleteLast() {
+            calcDisplay.value = calcDisplay.value.slice(0, -1);
+        }
+
+        function calculateResult() {
+            try {
+                let result = eval(calcDisplay.value.replace('×', '*'));
+                calcDisplay.value = result;
+            } catch (error) {
+                calcDisplay.value = 'Error';
+            }
+        }
+
+        // 폼 유효성 검사
+        const nameInput = document.getElementById('nameInput');
+        const emailInput = document.getElementById('emailInput');
+        const majorSelect = document.getElementById('majorSelect');
+        const smartForm = document.getElementById('smartForm');
+
+        nameInput.addEventListener('input', validateName);
+        emailInput.addEventListener('input', validateEmail);
+        majorSelect.addEventListener('change', validateMajor);
+
+        function validateName() {
+            const name = nameInput.value.trim();
+            const nameError = document.getElementById('nameError');
+            
+            if (name.length === 0) {
+                nameError.textContent = '이름을 입력해주세요.';
+                nameInput.style.borderColor = 'var(--danger-color)';
+            } else if (name.length < 2) {
+                nameError.textContent = '이름은 최소 2자 이상이어야 합니다.';
+                nameInput.style.borderColor = 'var(--danger-color)';
+            } else {
+                nameError.textContent = '';
+                nameInput.style.borderColor = 'var(--success-color)';
+            }
+        }
+
+        function validateEmail() {
+            const email = emailInput.value.trim();
+            const emailError = document.getElementById('emailError');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email.length === 0) {
+                emailError.textContent = '';
+                emailInput.style.borderColor = 'var(--border-color)';
+            } else if (!emailRegex.test(email)) {
+                emailError.textContent = '올바른 이메일 형식이 아닙니다.';
+                emailInput.style.borderColor = 'var(--danger-color)';
+            } else {
+                emailError.textContent = '';
+                emailInput.style.borderColor = 'var(--success-color)';
+            }
+        }
+
+        function validateMajor() {
+            const major = majorSelect.value;
+            const majorError = document.getElementById('majorError');
+            
+            if (major === '') {
+                majorError.textContent = '전공을 선택해주세요.';
+                majorSelect.style.borderColor = 'var(--danger-color)';
+            } else {
+                majorError.textContent = '';
+                majorSelect.style.borderColor = 'var(--success-color)';
+            }
+        }
+
+        smartForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            validateName();
+            validateEmail();
+            validateMajor();
+            
+            const errors = document.querySelectorAll('[id$="Error"]');
+            const hasErrors = Array.from(errors).some(error => error.textContent !== '');
+            
+            if (!hasErrors && nameInput.value.trim() !== '') {
+                alert('🎉 등록이 완료되었습니다!');
+            } else {
+                alert('❌ 입력 정보를 확인해주세요.');
+            }
+        });
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            updateProgress(0);
+        });
+    </script>
+</body>
+</html>

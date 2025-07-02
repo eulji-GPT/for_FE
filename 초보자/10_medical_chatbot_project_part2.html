@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>의료IT 챗봇 프로젝트 - 종합 실습 (Part 2 - JavaScript 기능)</title>
+    <style>
+        /* Part 1에서 이어지는 스타일 */
+        :root {
+            --color-medical-primary: #006ba6;
+            --color-medical-secondary: #0496c7;
+            --color-medical-accent: #ffb700;
+            --color-medical-success: #2e8b57;
+            --color-medical-warning: #ff6b35;
+            --color-medical-error: #dc2626;
+            --color-chat-user: #4f46e5;
+            --color-chat-bot: #10b981;
+            --color-chat-system: #6b7280;
+            --color-chat-background: #f8fafc;
+        }
+
+        /* JavaScript 기능을 위한 추가 스타일 */
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid var(--color-gray-200);
+            position: sticky;
+            bottom: 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--color-gray-200);
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: var(--color-medical-primary);
+        }
+
+        .send-button {
+            padding: 12px 20px;
+            background: var(--color-medical-primary);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .send-button:hover {
+            background: var(--color-medical-secondary);
+            transform: translateY(-2px);
+        }
+
+        .send-button:disabled {
+            background: var(--color-gray-400);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 20px;
+            color: var(--color-gray-500);
+            font-style: italic;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .message {
+            margin: 15px 0;
+            max-width: 80%;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .message.user {
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.bot {
+            margin-right: auto;
+        }
+
+        .message-bubble {
+            padding: 12px 18px;
+            border-radius: 18px;
+            display: inline-block;
+            max-width: 100%;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: var(--color-chat-user);
+            color: white;
+        }
+
+        .message.bot .message-bubble {
+            background: var(--color-chat-bot);
+            color: white;
+        }
+
+        .message.system .message-bubble {
+            background: var(--color-gray-100);
+            color: var(--color-gray-700);
+            border: 1px solid var(--color-gray-200);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            padding: 8px 16px;
+            background: var(--color-gray-100);
+            border: 1px solid var(--color-gray-300);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            background: var(--color-medical-primary);
+            color: white;
+        }
+
+        .medical-form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--color-gray-700);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--color-gray-200);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--color-medical-primary);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .medical-data-display {
+            background: var(--color-gray-50);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid var(--color-medical-primary);
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-weight: 600;
+            color: var(--color-gray-600);
+        }
+
+        .data-value {
+            color: var(--color-gray-800);
+        }
+
+        .medical-alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .medical-alert.info {
+            background: #e0f2fe;
+            border-color: var(--color-medical-info);
+            color: #01579b;
+        }
+
+        .medical-alert.success {
+            background: #e8f5e8;
+            border-color: var(--color-medical-success);
+            color: #1b5e20;
+        }
+
+        .medical-alert.warning {
+            background: #fff3e0;
+            border-color: var(--color-medical-warning);
+            color: #e65100;
+        }
+
+        .medical-alert.error {
+            background: #ffebee;
+            border-color: var(--color-medical-error);
+            color: #b71c1c;
+        }
+
+        .progress-container {
+            background: var(--color-gray-200);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--color-medical-primary);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .tab-container {
+            border-bottom: 2px solid var(--color-gray-200);
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--color-gray-600);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: var(--color-medical-primary);
+            border-bottom-color: var(--color-medical-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="chat-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="header-title">🏥 을지대 의료IT 챗봇</h1>
+                    <p class="header-subtitle">GPT 기반 의료정보 어시스턴트</p>
+                </div>
+                <div class="header-right">
+                    <div class="status-indicator online">
+                        <span class="status-dot"></span>
+                        <span class="status-text">온라인</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- 탭 네비게이션 -->
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="chat">💬 채팅</button>
+                    <button class="tab-button" data-tab="medical-info">🩺 의료정보</button>
+                    <button class="tab-button" data-tab="patient-form">📋 환자 정보</button>
+                    <button class="tab-button" data-tab="analytics">📊 분석</button>
+                </div>
+            </div>
+
+            <!-- 채팅 탭 -->
+            <div class="tab-content active" id="chat-tab">
+                <div class="chat-area" id="chatArea">
+                    <div class="message system">
+                        <div class="message-bubble">
+                            안녕하세요! 을지대학교 의료IT 챗봇입니다. 🏥<br>
+                            의료 정보, 건강 상담, 병원 안내 등 궁금한 것이 있으시면 언제든지 물어보세요!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="typing-indicator" id="typingIndicator">
+                    🤖 챗봇이 응답을 준비하고 있습니다...
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="sendQuickMessage('증상 체크')">증상 체크</button>
+                    <button class="quick-action-btn" onclick="sendQuickMessage('병원 안내')">병원 안내</button>
+                    <button class="quick-action-btn" onclick="sendQuickMessage('응급처치')">응급처치</button>
+                    <button class="quick-action-btn" onclick="sendQuickMessage('건강 정보')">건강 정보</button>
+                    <button class="quick-action-btn" onclick="sendQuickMessage('예약 안내')">예약 안내</button>
+                </div>
+
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chatInput" 
+                           placeholder="메시지를 입력하세요..." 
+                           onkeypress="handleKeyPress(event)">
+                    <button class="send-button" id="sendButton" onclick="sendMessage()">전송</button>
+                </div>
+            </div>
+
+            <!-- 의료정보 탭 -->
+            <div class="tab-content" id="medical-info-tab">
+                <div class="medical-form">
+                    <h3>🩺 의료정보 검색</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">검색 카테고리</label>
+                        <select class="form-select" id="medicalCategory">
+                            <option value="general">일반 의료정보</option>
+                            <option value="symptoms">증상별 정보</option>
+                            <option value="departments">진료과별 정보</option>
+                            <option value="procedures">시술/검사 정보</option>
+                            <option value="emergency">응급처치</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">검색어</label>
+                        <input type="text" class="form-input" id="medicalSearch" 
+                               placeholder="검색할 의료 정보를 입력하세요">
+                    </div>
+
+                    <button class="send-button" onclick="searchMedicalInfo()">검색</button>
+
+                    <div id="medicalResults" class="medical-data-display" style="display: none;">
+                        <!-- 검색 결과가 여기에 표시됩니다 -->
+                    </div>
+                </div>
+
+                <div class="medical-form">
+                    <h3>📊 의료 통계 대시보드</h3>
+                    
+                    <div class="medical-alert info">
+                        <strong>📈 오늘의 의료 통계</strong><br>
+                        - 총 상담 건수: <span id="consultationCount">0</span>건<br>
+                        - 응급 상담: <span id="emergencyCount">0</span>건<br>
+                        - 일반 상담: <span id="generalCount">0</span>건
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-bar" id="consultationProgress" style="width: 0%"></div>
+                    </div>
+                    <small>일일 상담 목표 대비 진행률</small>
+                </div>
+            </div>
+
+            <!-- 환자 정보 탭 -->
+            <div class="tab-content" id="patient-form-tab">
+                <div class="medical-form">
+                    <h3>📋 환자 정보 입력</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">환자명</label>
+                        <input type="text" class="form-input" id="patientName" placeholder="환자 이름을 입력하세요">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">생년월일</label>
+                        <input type="date" class="form-input" id="patientBirth">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">성별</label>
+                        <select class="form-select" id="patientGender">
+                            <option value="">선택하세요</option>
+                            <option value="male">남성</option>
+                            <option value="female">여성</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">연락처</label>
+                        <input type="tel" class="form-input" id="patientPhone" placeholder="010-0000-0000">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">주요 증상</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom1" value="fever">
+                                <label for="symptom1">발열</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom2" value="cough">
+                                <label for="symptom2">기침</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom3" value="headache">
+                                <label for="symptom3">두통</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom4" value="fatigue">
+                                <label for="symptom4">피로감</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">상세 증상 설명</label>
+                        <textarea class="form-textarea" id="symptomDescription" 
+                                  placeholder="증상을 자세히 설명해주세요..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">희망 진료과</label>
+                        <select class="form-select" id="preferredDepartment">
+                            <option value="">선택하세요</option>
+                            <option value="internal">내과</option>
+                            <option value="surgery">외과</option>
+                            <option value="pediatrics">소아과</option>
+                            <option value="orthopedics">정형외과</option>
+                            <option value="dermatology">피부과</option>
+                            <option value="ophthalmology">안과</option>
+                            <option value="emergency">응급의학과</option>
+                        </select>
+                    </div>
+
+                    <button class="send-button" onclick="submitPatientForm()" style="width: 100%; margin-top: 20px;">
+                        환자 정보 저장
+                    </button>
+                </div>
+            </div>
+
+            <!-- 분석 탭 -->
+            <div class="tab-content" id="analytics-tab">
+                <div class="medical-form">
+                    <h3>📊 의료IT 시스템 분석</h3>
+                    
+                    <div class="medical-alert success">
+                        <strong>✅ 시스템 상태</strong><br>
+                        모든 의료IT 시스템이 정상 작동 중입니다.
+                    </div>
+
+                    <div class="medical-data-display">
+                        <div class="data-row">
+                            <span class="data-label">서버 상태</span>
+                            <span class="data-value" style="color: var(--color-medical-success);">정상</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">데이터베이스 연결</span>
+                            <span class="data-value" style="color: var(--color-medical-success);">연결됨</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">API 응답시간</span>
+                            <span class="data-value">평균 120ms</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">활성 사용자</span>
+                            <span class="data-value" id="activeUsers">42명</span>
+                        </div>
+                    </div>
+
+                    <h4>📈 실시간 모니터링</h4>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="systemLoad" style="width: 65%"></div>
+                    </div>
+                    <small>시스템 부하: 65%</small>
+
+                    <div class="progress-container">
+                        <div class="progress-bar" id="memoryUsage" style="width: 72%"></div>
+                    </div>
+                    <small>메모리 사용률: 72%</small>
+
+                    <div class="progress-container">
+                        <div class="progress-bar" id="diskUsage" style="width: 43%"></div>
+                    </div>
+                    <small>디스크 사용률: 43%</small>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 모달 창 -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 id="modalTitle">알림</h3>
+            <div id="modalBody">
+                <!-- 모달 내용이 여기에 표시됩니다 -->
+            </div>
+            <button class="send-button" onclick="closeModal()" style="margin-top: 20px;">확인</button>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let consultationCount = 0;
+        let emergencyCount = 0;
+        let generalCount = 0;
+        let chatHistory = [];
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChat();
+            updateStatistics();
+            setInterval(updateRealTimeData, 5000); // 5초마다 실시간 데이터 업데이트
+        });
+
+        // 챗봇 초기화
+        function initializeChat() {
+            const chatArea = document.getElementById('chatArea');
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // 탭 전환 기능
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                switchTab(tabId);
+            });
+        });
+
+        function switchTab(tabId) {
+            // 모든 탭 버튼 비활성화
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 모든 탭 콘텐츠 숨기기
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 선택된 탭 활성화
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        }
+
+        // 메시지 전송 기능
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            // 사용자 메시지 추가
+            addMessage('user', message);
+            input.value = '';
+            
+            // 버튼 비활성화 및 타이핑 표시
+            document.getElementById('sendButton').disabled = true;
+            showTypingIndicator();
+            
+            // 봇 응답 시뮬레이션 (실제로는 API 호출)
+            setTimeout(() => {
+                const response = generateBotResponse(message);
+                addMessage('bot', response);
+                hideTypingIndicator();
+                document.getElementById('sendButton').disabled = false;
+                
+                // 통계 업데이트
+                consultationCount++;
+                if (isEmergencyQuery(message)) {
+                    emergencyCount++;
+                } else {
+                    generalCount++;
+                }
+                updateStatistics();
+            }, Math.random() * 2000 + 1000); // 1-3초 랜덤 지연
+        }
+
+        // 메시지 추가
+        function addMessage(type, content) {
+            const chatArea = document.getElementById('chatArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            bubbleDiv.innerHTML = content;
+            
+            messageDiv.appendChild(bubbleDiv);
+            chatArea.appendChild(messageDiv);
+            
+            // 스크롤을 아래로
+            chatArea.scrollTop = chatArea.scrollHeight;
+            
+            // 채팅 히스토리에 추가
+            chatHistory.push({ type, content, timestamp: new Date() });
+        }
+
+        // 키보드 이벤트 처리
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // 빠른 메시지 전송
+        function sendQuickMessage(message) {
+            document.getElementById('chatInput').value = message;
+            sendMessage();
+        }
+
+        // 타이핑 인디케이터 표시/숨기기
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').classList.add('active');
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').classList.remove('active');
+        }
+
+        // 봇 응답 생성 (시뮬레이션)
+        function generateBotResponse(userMessage) {
+            const message = userMessage.toLowerCase();
+            
+            if (message.includes('증상') || message.includes('아프') || message.includes('통증')) {
+                return `🩺 증상에 대해 문의해주셨네요. <br><br>
+                        더 정확한 진단을 위해 다음 정보를 알려주세요:<br>
+                        • 언제부터 증상이 시작되었나요?<br>
+                        • 증상의 정도는 어떤가요? (1-10점)<br>
+                        • 동반 증상이 있나요?<br><br>
+                        ⚠️ 심각한 증상의 경우 즉시 병원 방문을 권합니다.`;
+            }
+            
+            if (message.includes('병원') || message.includes('예약')) {
+                return `🏥 을지대학교병원 안내드립니다.<br><br>
+                        <strong>진료 예약:</strong><br>
+                        • 온라인 예약: www.eulji.ac.kr<br>
+                        • 전화 예약: 1588-1234<br>
+                        • 모바일 앱: 을지병원 앱<br><br>
+                        <strong>주요 진료과:</strong><br>
+                        내과, 외과, 소아과, 정형외과, 피부과 등<br><br>
+                        더 자세한 정보가 필요하시면 말씀해주세요!`;
+            }
+            
+            if (message.includes('응급') || message.includes('급해') || message.includes('위험')) {
+                return `🚨 <strong>응급상황 안내</strong><br><br>
+                        생명이 위험한 응급상황이라면:<br>
+                        • 즉시 119에 신고하세요<br>
+                        • 을지대병원 응급실: 031-740-7119<br><br>
+                        <strong>응급처치 기본 요령:</strong><br>
+                        1. 환자를 안전한 곳으로 이동<br>
+                        2. 의식 확인 및 기도 확보<br>
+                        3. 출혈 시 지혈<br>
+                        4. 전문의료진 도착까지 현상유지<br><br>
+                        ⚠️ 전문의의 진료가 필요합니다.`;
+            }
+            
+            if (message.includes('건강') || message.includes('예방')) {
+                return `💪 건강관리 정보를 안내드립니다.<br><br>
+                        <strong>기본 건강관리 수칙:</strong><br>
+                        • 규칙적인 운동 (주 3회 이상)<br>
+                        • 균형잡힌 식단<br>
+                        • 충분한 수면 (7-8시간)<br>
+                        • 금연, 금주<br>
+                        • 정기 건강검진<br><br>
+                        <strong>계절별 주의사항:</strong><br>
+                        겨울철 독감 예방접종, 여름철 탈수 주의 등<br><br>
+                        구체적인 건강 상담이 필요하시면 전문의와 상담받으세요.`;
+            }
+            
+            // 기본 응답
+            return `안녕하세요! 을지대 의료IT 챗봇입니다. 🤖<br><br>
+                    다음과 같은 도움을 드릴 수 있습니다:<br>
+                    • 증상 상담 및 진료과 안내<br>
+                    • 병원 예약 및 이용 안내<br>
+                    • 응급처치 및 건강정보<br>
+                    • 의료진 소개 및 시설 안내<br><br>
+                    궁금한 것이 있으시면 언제든지 물어보세요!`;
+        }
+
+        // 응급 쿼리 판단
+        function isEmergencyQuery(message) {
+            const emergencyKeywords = ['응급', '위험', '급해', '119', '생명', '심각', '위급'];
+            return emergencyKeywords.some(keyword => message.includes(keyword));
+        }
+
+        // 의료정보 검색
+        function searchMedicalInfo() {
+            const category = document.getElementById('medicalCategory').value;
+            const searchTerm = document.getElementById('medicalSearch').value;
+            
+            if (!searchTerm.trim()) {
+                showModal('알림', '검색어를 입력해주세요.');
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('medicalResults');
+            resultsDiv.style.display = 'block';
+            
+            // 시뮬레이션된 검색 결과
+            resultsDiv.innerHTML = `
+                <h4>🔍 "${searchTerm}" 검색 결과</h4>
+                <div class="data-row">
+                    <span class="data-label">카테고리</span>
+                    <span class="data-value">${getCategoryName(category)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">관련 정보</span>
+                    <span class="data-value">${generateMedicalInfo(searchTerm)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">추천 진료과</span>
+                    <span class="data-value">${getRecommendedDepartment(searchTerm)}</span>
+                </div>
+            `;
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'general': '일반 의료정보',
+                'symptoms': '증상별 정보',
+                'departments': '진료과별 정보',
+                'procedures': '시술/검사 정보',
+                'emergency': '응급처치'
+            };
+            return categories[category] || '일반 의료정보';
+        }
+
+        function generateMedicalInfo(term) {
+            // 실제로는 의료 데이터베이스에서 검색
+            return `${term}와 관련된 의료정보를 찾았습니다. 자세한 내용은 전문의와 상담하시기 바랍니다.`;
+        }
+
+        function getRecommendedDepartment(term) {
+            const keywords = {
+                '감기': '내과',
+                '두통': '신경과',
+                '복통': '내과',
+                '피부': '피부과',
+                '눈': '안과',
+                '뼈': '정형외과'
+            };
+            
+            for (const [keyword, dept] of Object.entries(keywords)) {
+                if (term.includes(keyword)) {
+                    return dept;
+                }
+            }
+            return '내과';
+        }
+
+        // 환자 정보 제출
+        function submitPatientForm() {
+            const patientData = {
+                name: document.getElementById('patientName').value,
+                birth: document.getElementById('patientBirth').value,
+                gender: document.getElementById('patientGender').value,
+                phone: document.getElementById('patientPhone').value,
+                symptoms: getSelectedSymptoms(),
+                description: document.getElementById('symptomDescription').value,
+                department: document.getElementById('preferredDepartment').value
+            };
+            
+            // 필수 필드 확인
+            if (!patientData.name || !patientData.birth || !patientData.gender) {
+                showModal('입력 오류', '필수 정보를 모두 입력해주세요.');
+                return;
+            }
+            
+            // 환자 정보 저장 (시뮬레이션)
+            console.log('환자 정보 저장:', patientData);
+            
+            showModal('저장 완료', `환자 정보가 성공적으로 저장되었습니다.<br><br>
+                     환자명: ${patientData.name}<br>
+                     연락처: ${patientData.phone}<br>
+                     희망 진료과: ${getDepartmentName(patientData.department)}`);
+            
+            // 폼 초기화
+            resetPatientForm();
+        }
+
+        function getSelectedSymptoms() {
+            const symptoms = [];
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                symptoms.push(checkbox.value);
+            });
+            return symptoms;
+        }
+
+        function getDepartmentName(dept) {
+            const departments = {
+                'internal': '내과',
+                'surgery': '외과',
+                'pediatrics': '소아과',
+                'orthopedics': '정형외과',
+                'dermatology': '피부과',
+                'ophthalmology': '안과',
+                'emergency': '응급의학과'
+            };
+            return departments[dept] || '내과';
+        }
+
+        function resetPatientForm() {
+            document.getElementById('patientName').value = '';
+            document.getElementById('patientBirth').value = '';
+            document.getElementById('patientGender').value = '';
+            document.getElementById('patientPhone').value = '';
+            document.getElementById('symptomDescription').value = '';
+            document.getElementById('preferredDepartment').value = '';
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        // 통계 업데이트
+        function updateStatistics() {
+            document.getElementById('consultationCount').textContent = consultationCount;
+            document.getElementById('emergencyCount').textContent = emergencyCount;
+            document.getElementById('generalCount').textContent = generalCount;
+            
+            // 진행률 계산 (목표: 100건)
+            const progress = Math.min((consultationCount / 100) * 100, 100);
+            document.getElementById('consultationProgress').style.width = progress + '%';
+        }
+
+        // 실시간 데이터 업데이트
+        function updateRealTimeData() {
+            // 시뮬레이션된 실시간 데이터
+            const activeUsers = Math.floor(Math.random() * 20) + 30;
+            document.getElementById('activeUsers').textContent = activeUsers + '명';
+            
+            // 시스템 부하 시뮬레이션
+            const systemLoad = Math.floor(Math.random() * 30) + 50;
+            const memoryUsage = Math.floor(Math.random() * 20) + 60;
+            const diskUsage = Math.floor(Math.random() * 10) + 40;
+            
+            document.getElementById('systemLoad').style.width = systemLoad + '%';
+            document.getElementById('memoryUsage').style.width = memoryUsage + '%';
+            document.getElementById('diskUsage').style.width = diskUsage + '%';
+        }
+
+        // 모달 표시/숨기기
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        // 키보드 단축키
+        document.addEventListener('keydown', function(event) {
+            // ESC 키로 모달 닫기
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+            
+            // Ctrl+Enter로 메시지 전송
+            if (event.ctrlKey && event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

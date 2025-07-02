@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고급 CSS 애니메이션 - 인터랙티브 웹 경험</title>
+    <style>
+        /* CSS 변수 정의 */
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --success-color: #00d4aa;
+            --warning-color: #ffb84d;
+            --error-color: #ff6b6b;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow: 0 5px 15px rgba(0,0,0,0.1);
+            --shadow-hover: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* 헤더 스타일 */
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 3px solid var(--primary-color);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 배경 애니메이션 */
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            animation: rotate 10s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: var(--text-light);
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        /* 섹션 공통 스타일 */
+        .section {
+            margin-bottom: 50px;
+            padding: 30px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            animation: slideInFromLeft 0.8s ease-out;
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        h2 {
+            color: var(--text-dark);
+            border-left: 5px solid var(--primary-color);
+            padding-left: 15px;
+            margin-bottom: 20px;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            animation: expandWidth 2s ease-out 0.5s forwards;
+        }
+
+        @keyframes expandWidth {
+            to { width: 100%; }
+        }
+
+        h3 {
+            color: var(--text-dark);
+            margin: 25px 0 15px 0;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+        }
+
+        /* 코드 블록 */
+        .code-block {
+            background: var(--text-dark);
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '⚡ CSS';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        /* 예제 컨테이너 */
+        .demo-container {
+            border: 2px solid var(--primary-color);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 1. 기본 애니메이션 효과 */
+        .basic-animations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .anim-box {
+            height: 120px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .anim-box:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* 페이드 인 애니메이션 */
+        .fade-in {
+            animation: fadeIn 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.3; }
+            to { opacity: 1; }
+        }
+
+        /* 슬라이드 애니메이션 */
+        .slide-animation {
+            animation: slideLeftRight 3s ease-in-out infinite;
+        }
+
+        @keyframes slideLeftRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+        }
+
+        /* 회전 애니메이션 */
+        .rotate-animation {
+            animation: rotateY 2s linear infinite;
+        }
+
+        @keyframes rotateY {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+
+        /* 바운스 애니메이션 */
+        .bounce-animation {
+            animation: bounce 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        /* 2. 호버 효과 */
+        .hover-effects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .hover-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 리프트 효과 */
+        .lift-effect:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* 글로우 효과 */
+        .glow-effect {
+            position: relative;
+        }
+
+        .glow-effect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 10px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .glow-effect:hover::before {
+            opacity: 0.2;
+        }
+
+        /* 플립 효과 */
+        .flip-effect {
+            perspective: 1000px;
+        }
+
+        .flip-effect:hover {
+            transform: rotateY(10deg) rotateX(10deg);
+        }
+
+        /* 스케일 효과 */
+        .scale-effect:hover {
+            transform: scale(1.1);
+        }
+
+        /* 3. 복잡한 키프레임 애니메이션 */
+        .complex-animation {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, var(--success-color), var(--warning-color));
+            border-radius: 50%;
+            margin: 30px auto;
+            animation: complexMove 4s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes complexMove {
+            0% {
+                transform: translateX(0) rotate(0deg);
+                border-radius: 50%;
+                background: linear-gradient(45deg, var(--success-color), var(--warning-color));
+            }
+            25% {
+                transform: translateX(100px) rotate(90deg);
+                border-radius: 20%;
+                background: linear-gradient(45deg, var(--warning-color), var(--error-color));
+            }
+            50% {
+                transform: translateX(100px) translateY(50px) rotate(180deg);
+                border-radius: 10%;
+                background: linear-gradient(45deg, var(--error-color), var(--primary-color));
+            }
+            75% {
+                transform: translateX(0) translateY(50px) rotate(270deg);
+                border-radius: 30%;
+                background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            }
+            100% {
+                transform: translateX(0) translateY(0) rotate(360deg);
+                border-radius: 50%;
+                background: linear-gradient(45deg, var(--success-color), var(--warning-color));
+            }
+        }
+
+        /* 4. 텍스트 애니메이션 */
+        .text-animations {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .typewriter {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            border-right: 3px solid var(--primary-color);
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            animation: typewriter 4s steps(40, end) infinite,
+                       blink 1s infinite;
+        }
+
+        @keyframes typewriter {
+            0% { width: 0; }
+            50% { width: 100%; }
+            100% { width: 0; }
+        }
+
+        @keyframes blink {
+            0%, 50% { border-color: var(--primary-color); }
+            51%, 100% { border-color: transparent; }
+        }
+
+        .wave-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin: 20px 0;
+        }
+
+        .wave-text span {
+            display: inline-block;
+            animation: wave 2s ease-in-out infinite;
+        }
+
+        .wave-text span:nth-child(2) { animation-delay: 0.1s; }
+        .wave-text span:nth-child(3) { animation-delay: 0.2s; }
+        .wave-text span:nth-child(4) { animation-delay: 0.3s; }
+        .wave-text span:nth-child(5) { animation-delay: 0.4s; }
+        .wave-text span:nth-child(6) { animation-delay: 0.5s; }
+
+        @keyframes wave {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* 5. 로딩 애니메이션 */
+        .loading-animations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .dots-loader {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            animation: dotPulse 1.4s ease-in-out infinite both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes dotPulse {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 10px;
+            background: var(--border-color);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px auto;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 5px;
+            animation: progress 3s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+
+        /* 6. 인터랙티브 버튼 */
+        .interactive-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .interactive-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 물결 효과 버튼 */
+        .ripple-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .ripple-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.6s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .ripple-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* 그라데이션 애니메이션 버튼 */
+        .gradient-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--secondary-color));
+            background-size: 300% 300%;
+            color: white;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 네온 효과 버튼 */
+        .neon-btn {
+            background: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-color);
+            animation: neonPulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes neonPulse {
+            from {
+                text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+                box-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+            }
+            to {
+                text-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color), 0 0 15px var(--accent-color);
+                box-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color), 0 0 15px var(--accent-color);
+            }
+        }
+
+        /* 7. 성능 최적화 */
+        .performance-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        /* GPU 가속 사용 */
+        .gpu-accelerated {
+            background: var(--success-color);
+            height: 100px;
+            border-radius: 10px;
+            animation: gpuMove 2s ease-in-out infinite alternate;
+            will-change: transform; /* GPU 가속 힌트 */
+        }
+
+        @keyframes gpuMove {
+            from { transform: translate3d(0, 0, 0) rotate3d(1, 1, 1, 0deg); }
+            to { transform: translate3d(50px, 0, 0) rotate3d(1, 1, 1, 180deg); }
+        }
+
+        /* CSS 변수 기반 애니메이션 */
+        .variable-animation {
+            background: var(--warning-color);
+            height: 100px;
+            border-radius: 10px;
+            animation: variableScale 3s ease-in-out infinite;
+            --scale-factor: 1;
+        }
+
+        @keyframes variableScale {
+            0% { transform: scale(var(--scale-factor)); }
+            50% { transform: scale(calc(var(--scale-factor) * 1.2)); }
+            100% { transform: scale(var(--scale-factor)); }
+        }
+
+        /* 반응형 조정 */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .basic-animations,
+            .hover-effects,
+            .interactive-buttons,
+            .loading-animations,
+            .performance-demo {
+                grid-template-columns: 1fr;
+            }
+            
+            .complex-animation {
+                width: 80px;
+                height: 80px;
+            }
+            
+            @keyframes complexMove {
+                0% { transform: translateX(0) rotate(0deg); }
+                25% { transform: translateX(50px) rotate(90deg); }
+                50% { transform: translateX(50px) translateY(30px) rotate(180deg); }
+                75% { transform: translateX(0) translateY(30px) rotate(270deg); }
+                100% { transform: translateX(0) translateY(0) rotate(360deg); }
+            }
+        }
+
+        /* 애니메이션 성능 최적화 */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>고급 CSS 애니메이션</h1>
+            <p class="subtitle">인터랙티브하고 매력적인 웹 경험 만들기</p>
+            <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; border-radius: 8px; position: relative; z-index: 1;">
+                <p style="margin: 0; font-size: 1.1rem;"><strong>을지대학교 의료IT 안건</strong> 제작</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.95rem;">을GPT팀원을 위한 고급 CSS 애니메이션 학습용 실습 파일</p>
+            </div>
+        </header>
+
+        <div class="section">
+            <h2>1. 기본 애니메이션 효과</h2>
+            <p>CSS @keyframes와 animation 속성을 사용한 기본적인 애니메이션 효과들입니다.</p>
+            
+            <div class="code-block">
+/* 기본 애니메이션 문법 */
+@keyframes animationName {
+    0% { /* 시작 상태 */ }
+    50% { /* 중간 상태 */ }
+    100% { /* 끝 상태 */ }
+}
+
+.element {
+    animation: animationName 2s ease-in-out infinite;
+    /* 이름 지속시간 타이밍함수 반복횟수 */
+}
+
+/* 성능 최적화를 위한 속성 */
+.optimized {
+    will-change: transform;
+    transform: translate3d(0, 0, 0); /* GPU 가속 */
+}
+            </div>
+
+            <div class="demo-container">
+                <h4>다양한 애니메이션 효과 (호버해보세요!)</h4>
+                <div class="basic-animations">
+                    <div class="anim-box fade-in">페이드 인</div>
+                    <div class="anim-box slide-animation">슬라이드</div>
+                    <div class="anim-box rotate-animation">회전</div>
+                    <div class="anim-box bounce-animation">바운스</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2. 호버 효과와 트랜지션</h2>
+            <p>사용자 인터랙션에 반응하는 부드러운 호버 효과들입니다.</p>
+            
+            <div class="code-block">
+/* 부드러운 트랜지션 */
+.hover-element {
+    transition: all 0.3s ease;
+    /* 모든 속성에 0.3초 ease 트랜지션 */
+}
+
+.hover-element:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* 복잡한 호버 효과 */
+.glow-effect::before {
+    content: '';
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.glow-effect:hover::before {
+    opacity: 0.2;
+}
+            </div>
+
+            <div class="demo-container">
+                <h4>호버 효과 데모 (마우스를 올려보세요!)</h4>
+                <div class="hover-effects">
+                    <div class="hover-card lift-effect">
+                        <h4>리프트 효과</h4>
+                        <p>위로 떠오르는 느낌</p>
+                    </div>
+                    <div class="hover-card glow-effect">
+                        <h4>글로우 효과</h4>
+                        <p>은은한 빛의 효과</p>
+                    </div>
+                    <div class="hover-card flip-effect">
+                        <h4>3D 플립</h4>
+                        <p>입체적인 회전</p>
+                    </div>
+                    <div class="hover-card scale-effect">
+                        <h4>스케일 효과</h4>
+                        <p>크기 변화 효과</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3. 복잡한 키프레임 애니메이션</h2>
+            <p>여러 단계를 거치는 복잡한 애니메이션을 만들어보겠습니다.</p>
+            
+            <div class="code-block">
+@keyframes complexMove {
+    0% {
+        transform: translateX(0) rotate(0deg);
+        border-radius: 50%;
+        background: linear-gradient(45deg, #00d4aa, #ffb84d);
+    }
+    25% {
+        transform: translateX(100px) rotate(90deg);
+        border-radius: 20%;
+        background: linear-gradient(45deg, #ffb84d, #ff6b6b);
+    }
+    50% {
+        transform: translateX(100px) translateY(50px) rotate(180deg);
+        border-radius: 10%;
+    }
+    75% {
+        transform: translateX(0) translateY(50px) rotate(270deg);
+        border-radius: 30%;
+    }
+    100% {
+        transform: translateX(0) translateY(0) rotate(360deg);
+        border-radius: 50%;
+    }
+}
+            </div>
+
+            <div class="demo-container">
+                <h4>복잡한 모션 경로</h4>
+                <div class="complex-animation"></div>
+                <p style="text-align: center; color: var(--text-light); margin-top: 20px;">
+                    이동 + 회전 + 모양 변화 + 색상 변화를 동시에 진행하는 애니메이션
+                </p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>4. 텍스트 애니메이션</h2>
+            <p>텍스트에 생동감을 불어넣는 다양한 애니메이션 기법들입니다.</p>
+            
+            <div class="code-block">
+/* 타이핑 효과 */
+.typewriter {
+    border-right: 3px solid;
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typewriter 4s steps(40, end) infinite,
+               blink 1s infinite;
+}
+
+@keyframes typewriter {
+    0% { width: 0; }
+    50% { width: 100%; }
+    100% { width: 0; }
+}
+
+/* 웨이브 텍스트 */
+.wave-text span {
+    display: inline-block;
+    animation: wave 2s ease-in-out infinite;
+}
+
+.wave-text span:nth-child(n) {
+    animation-delay: calc(n * 0.1s);
+}
+            </div>
+
+            <div class="demo-container">
+                <div class="text-animations">
+                    <div class="typewriter">을지대학교 의료IT 안건입니다!</div>
+                    
+                    <div class="wave-text">
+                        <span>안</span>
+                        <span>건</span>
+                        <span>과</span>
+                        <span> </span>
+                        <span>유</span>
+                        <span>진</span>
+                        <span>우</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>5. 로딩 애니메이션</h2>
+            <p>사용자 경험을 향상시키는 다양한 로딩 애니메이션들입니다.</p>
+            
+            <div class="code-block">
+/* 스피너 로더 */
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* 점 애니메이션 */
+.dot {
+    animation: dotPulse 1.4s ease-in-out infinite both;
+}
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+
+/* 프로그레스 바 */
+.progress-fill {
+    animation: progress 3s ease-in-out infinite;
+}
+@keyframes progress {
+    0% { width: 0%; }
+    50% { width: 100%; }
+    100% { width: 0%; }
+}
+            </div>
+
+            <div class="demo-container">
+                <h4>로딩 애니메이션 모음</h4>
+                <div class="loading-animations">
+                    <div>
+                        <div class="spinner"></div>
+                        <p>스피너</p>
+                    </div>
+                    <div>
+                        <div class="dots-loader">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <p>점 로더</p>
+                    </div>
+                    <div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <p>프로그레스 바</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>6. 인터랙티브 버튼 애니메이션</h2>
+            <p>클릭하고 싶게 만드는 매력적인 버튼 애니메이션들입니다.</p>
+            
+            <div class="code-block">
+/* 물결 효과 */
+.ripple-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transition: all 0.6s ease;
+    transform: translate(-50%, -50%);
+}
+
+.ripple-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* 그라데이션 애니메이션 */
+.gradient-btn {
+    background: linear-gradient(45deg, color1, color2, color3);
+    background-size: 300% 300%;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+            </div>
+
+            <div class="demo-container">
+                <h4>인터랙티브 버튼들</h4>
+                <div class="interactive-buttons">
+                    <button class="interactive-btn ripple-btn">물결 효과</button>
+                    <button class="interactive-btn gradient-btn">그라데이션 애니메이션</button>
+                    <button class="interactive-btn neon-btn">네온 효과</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>7. 성능 최적화 기법</h2>
+            <p>애니메이션 성능을 최적화하는 중요한 기법들입니다.</p>
+            
+            <div class="code-block">
+/* GPU 가속 활용 */
+.gpu-accelerated {
+    will-change: transform;  /* 브라우저에게 변화 예고 */
+    transform: translate3d(0, 0, 0);  /* 3D 변환으로 GPU 가속 */
+}
+
+/* 애니메이션할 속성을 transform과 opacity로 제한 */
+@keyframes optimized {
+    from { 
+        transform: translateX(0) scale(1);
+        opacity: 0.5;
+    }
+    to { 
+        transform: translateX(100px) scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* 접근성 고려 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* CSS 변수 활용 */
+.element {
+    --duration: 2s;
+    --easing: ease-in-out;
+    animation: moveElement var(--duration) var(--easing) infinite;
+}
+            </div>
+
+            <div class="demo-container">
+                <h4>성능 최적화 데모</h4>
+                <div class="performance-demo">
+                    <div class="gpu-accelerated">
+                        <p style="color: white; text-align: center; line-height: 100px; margin: 0;">GPU 가속</p>
+                    </div>
+                    <div class="variable-animation">
+                        <p style="color: white; text-align: center; line-height: 100px; margin: 0;">CSS 변수 활용</p>
+                    </div>
+                </div>
+                
+                <h4 style="margin-top: 30px;">⚡ 성능 최적화 체크리스트</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid var(--success-color);">
+                        <h5 style="color: var(--success-color); margin-top: 0;">✅ 좋은 습관</h5>
+                        <ul style="font-size: 0.9rem; margin: 0;">
+                            <li>transform과 opacity 사용</li>
+                            <li>will-change 속성 활용</li>
+                            <li>GPU 가속 적용</li>
+                            <li>접근성 고려</li>
+                        </ul>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid var(--error-color);">
+                        <h5 style="color: var(--error-color); margin-top: 0;">⚠️ 피해야 할 것</h5>
+                        <ul style="font-size: 0.9rem; margin: 0;">
+                            <li>left, top, width, height 애니메이션</li>
+                            <li>복잡한 그라데이션 변화</li>
+                            <li>과도한 애니메이션</li>
+                            <li>성능 테스트 생략</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>8. 실무 적용 팁</h2>
+            
+            <h3>🎯 애니메이션 디자인 원칙</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
+                <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                    <h4 style="color: var(--primary-color); margin-top: 0;">📱 사용자 경험</h4>
+                    <ul style="color: var(--text-dark); margin: 0;">
+                        <li><strong>목적성:</strong> 모든 애니메이션은 목적이 있어야 함</li>
+                        <li><strong>일관성:</strong> 브랜드와 일치하는 느낌</li>
+                        <li><strong>피드백:</strong> 사용자 행동에 대한 반응</li>
+                        <li><strong>접근성:</strong> 모든 사용자를 고려</li>
+                    </ul>
+                </div>
+                
+                <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid var(--success-color);">
+                    <h4 style="color: var(--success-color); margin-top: 0;">⚡ 성능 가이드</h4>
+                    <ul style="color: var(--text-dark); margin: 0;">
+                        <li><strong>60fps 목표:</strong> 부드러운 애니메이션</li>
+                        <li><strong>GPU 활용:</strong> transform과 opacity</li>
+                        <li><strong>메모리 관리:</strong> will-change 적절히 사용</li>
+                        <li><strong>배터리 고려:</strong> 모바일 최적화</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🛠️ 디버깅 도구</h3>
+            <div class="code-block">
+/* Chrome DevTools에서 성능 확인 */
+/* Performance 탭에서 애니메이션 성능 모니터링 */
+
+/* 애니메이션 일시정지 (디버깅용) */
+*, *::before, *::after {
+    animation-play-state: paused !important;
+}
+
+/* 느린 애니메이션 (테스트용) */
+* {
+    animation-duration: 5s !important;
+    transition-duration: 2s !important;
+}
+            </div>
+
+            <h3>💡 창의적 아이디어</h3>
+            <div style="background: linear-gradient(135deg, var(--accent-color), var(--primary-color)); color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <p style="margin: 0; font-size: 1.1rem;">
+                    <strong>안건과 유진우의 프로젝트 아이디어:</strong><br>
+                    1. 의료 데이터 시각화 대시보드 (차트 애니메이션)<br>
+                    2. 환자 정보 입력 폼 (단계별 애니메이션)<br>
+                    3. 병원 예약 시스템 (로딩과 피드백 애니메이션)<br>
+                    4. 의료기기 상태 모니터링 (실시간 애니메이션)
+                </p>
+            </div>
+        </div>
+
+        <footer style="margin-top: 50px; text-align: center; color: var(--text-light); border-top: 1px solid var(--border-color); padding-top: 20px;">
+            <p>고급 CSS 애니메이션 마스터 가이드 - 인터랙티브한 웹 경험의 시작</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">
+                제작: 을지대학교 의료IT 안건 | 을GPT팀원 전용 고급 학습 자료
+            </p>
+            <div style="margin-top: 15px; font-size: 0.9rem;">
+                <strong>다음 단계:</strong> JavaScript와 CSS 애니메이션 연동, Web Animations API 활용
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // JavaScript로 애니메이션 제어 예제
+        document.addEventListener('DOMContentLoaded', function() {
+            // 버튼 클릭 시 애니메이션 효과
+            const buttons = document.querySelectorAll('.interactive-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // 스크롤에 따른 애니메이션 (Intersection Observer 활용)
+            const sections = document.querySelectorAll('.section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'slideInFromLeft 0.8s ease-out';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>

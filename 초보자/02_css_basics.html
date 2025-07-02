@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS 기초 - 선택자와 스타일 속성</title>
+    <style>
+        /* 전체 페이지 스타일 */
+        body {
+            font-family: 'Malgun Gothic', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* 제목 스타일 */
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #34495e;
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            margin-top: 40px;
+        }
+
+        /* 섹션 스타일 */
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        /* 코드 블록 스타일 */
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+        }
+
+        /* 결과 보기 스타일 */
+        .example-output {
+            border: 2px solid #3498db;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: white;
+        }
+
+        /* CSS 선택자 예제들 */
+        #unique-id {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .highlight {
+            background-color: #f1c40f;
+            padding: 3px 6px;
+            border-radius: 3px;
+        }
+
+        .blue-text {
+            color: #3498db;
+        }
+
+        .large-text {
+            font-size: 1.5em;
+        }
+
+        /* 박스 모델 예제 */
+        .box-example {
+            width: 200px;
+            height: 100px;
+            padding: 20px;
+            margin: 20px;
+            border: 5px solid #3498db;
+            background-color: #ecf0f1;
+            display: inline-block;
+        }
+
+        /* 테두리 스타일 예제 */
+        .border-solid { border: 3px solid #e74c3c; }
+        .border-dashed { border: 3px dashed #f39c12; }
+        .border-dotted { border: 3px dotted #27ae60; }
+        .border-radius { border: 3px solid #9b59b6; border-radius: 15px; }
+
+        /* 배경 예제 */
+        .bg-color { background-color: #3498db; color: white; }
+        .bg-gradient {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+        }
+
+        /* 텍스트 정렬 예제 */
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+
+        /* 폰트 예제 */
+        .font-small { font-size: 0.8em; }
+        .font-large { font-size: 1.5em; }
+        .font-bold { font-weight: bold; }
+        .font-italic { font-style: italic; }
+
+        /* 위치 예제 */
+        .position-relative {
+            position: relative;
+            background: #f8f9fa;
+            height: 150px;
+            border: 2px solid #dee2e6;
+        }
+
+        .position-absolute {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff6b6b;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* 플렉스 박스 예제 */
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .flex-item {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            flex: 1;
+            margin: 0 10px;
+            text-align: center;
+        }
+
+        /* 호버 효과 */
+        .hover-effect {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin: 10px;
+            text-align: center;
+        }
+
+        .hover-effect:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        /* 그리드 예제 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .grid-item {
+            background: #9b59b6;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        /* 반응형 스타일 */
+        @media (max-width: 768px) {
+            .flex-container {
+                flex-direction: column;
+            }
+            .flex-item {
+                margin: 5px 0;
+            }
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CSS 기초 - 선택자와 스타일 속성</h1>
+        <div style="text-align: center; margin-bottom: 30px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
+            <p style="margin: 0; font-size: 1.1rem;"><strong>을지대학교 의료IT 안건</strong> 제작</p>
+            <p style="margin: 5px 0 0 0; font-size: 0.95rem;">을GPT팀원을 위한 HTML/CSS 학습용 실습 파일</p>
+        </div>
+
+        <div class="section">
+            <h2>1. CSS 선택자 (Selectors)</h2>
+            
+            <h3>기본 선택자</h3>
+            <div class="code-block">
+/* 태그 선택자 */
+p { color: blue; }
+
+/* 클래스 선택자 */
+.highlight { background-color: yellow; }
+
+/* ID 선택자 */
+#unique-id { color: red; font-weight: bold; }
+
+/* 전체 선택자 */
+* { margin: 0; padding: 0; }
+            </div>
+
+            <div class="example-output">
+                <p>이것은 태그 선택자로 스타일이 적용된 단락입니다.</p>
+                <p class="highlight">이것은 클래스 선택자로 하이라이트된 텍스트입니다.</p>
+                <p id="unique-id">이것은 ID 선택자로 스타일이 적용된 고유한 요소입니다.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2. 텍스트 스타일</h2>
+            
+            <div class="code-block">
+.blue-text { color: #3498db; }
+.large-text { font-size: 1.5em; }
+.font-bold { font-weight: bold; }
+.font-italic { font-style: italic; }
+.text-center { text-align: center; }
+            </div>
+
+            <div class="example-output">
+                <p class="blue-text">파란색 텍스트</p>
+                <p class="large-text">큰 크기 텍스트</p>
+                <p class="font-bold">굵은 텍스트</p>
+                <p class="font-italic">기울어진 텍스트</p>
+                <p class="text-center">가운데 정렬 텍스트</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3. 박스 모델 (Box Model)</h2>
+            <p>모든 HTML 요소는 박스 모델을 가집니다: 내용(content) → 패딩(padding) → 테두리(border) → 마진(margin)</p>
+            
+            <div class="code-block">
+.box-example {
+    width: 200px;
+    height: 100px;
+    padding: 20px;      /* 내부 여백 */
+    margin: 20px;       /* 외부 여백 */
+    border: 5px solid #3498db;  /* 테두리 */
+    background-color: #ecf0f1;
+}
+            </div>
+
+            <div class="example-output">
+                <div class="box-example">
+                    박스 모델 예제<br>
+                    패딩과 마진 확인
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>4. 테두리 스타일</h2>
+            
+            <div class="code-block">
+.border-solid { border: 3px solid #e74c3c; }
+.border-dashed { border: 3px dashed #f39c12; }
+.border-dotted { border: 3px dotted #27ae60; }
+.border-radius { border-radius: 15px; }
+            </div>
+
+            <div class="example-output">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div class="border-solid" style="padding: 15px;">실선 테두리</div>
+                    <div class="border-dashed" style="padding: 15px;">대시 테두리</div>
+                    <div class="border-dotted" style="padding: 15px;">점선 테두리</div>
+                    <div class="border-radius border-solid" style="padding: 15px;">둥근 모서리</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>5. 배경 스타일</h2>
+            
+            <div class="code-block">
+.bg-color { 
+    background-color: #3498db; 
+    color: white; 
+}
+
+.bg-gradient {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    color: white;
+}
+            </div>
+
+            <div class="example-output">
+                <div class="bg-color" style="padding: 20px; margin: 10px; border-radius: 8px;">
+                    단색 배경
+                </div>
+                <div class="bg-gradient" style="padding: 20px; margin: 10px; border-radius: 8px;">
+                    그라디언트 배경
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>6. 위치 속성 (Position)</h2>
+            
+            <div class="code-block">
+.position-relative {
+    position: relative;  /* 기준점 역할 */
+}
+
+.position-absolute {
+    position: absolute;  /* 절대 위치 */
+    top: 20px;
+    right: 20px;
+}
+            </div>
+
+            <div class="example-output">
+                <div class="position-relative">
+                    이것은 relative 위치의 컨테이너입니다.
+                    <div class="position-absolute">Absolute</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>7. Flexbox 레이아웃</h2>
+            
+            <div class="code-block">
+.flex-container {
+    display: flex;
+    justify-content: space-between;  /* 가로 정렬 */
+    align-items: center;             /* 세로 정렬 */
+}
+
+.flex-item {
+    flex: 1;  /* 동일한 크기로 확장 */
+}
+            </div>
+
+            <div class="example-output">
+                <div class="flex-container">
+                    <div class="flex-item">아이템 1</div>
+                    <div class="flex-item">아이템 2</div>
+                    <div class="flex-item">아이템 3</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>8. CSS Grid 레이아웃</h2>
+            
+            <div class="code-block">
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);  /* 3개 열 */
+    gap: 15px;  /* 간격 */
+}
+            </div>
+
+            <div class="example-output">
+                <div class="grid-container">
+                    <div class="grid-item">그리드 1</div>
+                    <div class="grid-item">그리드 2</div>
+                    <div class="grid-item">그리드 3</div>
+                    <div class="grid-item">그리드 4</div>
+                    <div class="grid-item">그리드 5</div>
+                    <div class="grid-item">그리드 6</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>9. 호버 효과와 트랜지션</h2>
+            
+            <div class="code-block">
+.hover-effect {
+    transition: all 0.3s ease;  /* 부드러운 전환 */
+}
+
+.hover-effect:hover {
+    background: #2980b9;
+    transform: translateY(-3px);  /* 위로 이동 */
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+            </div>
+
+            <div class="example-output">
+                <div class="hover-effect">마우스를 올려보세요!</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>10. 반응형 디자인 (@media)</h2>
+            
+            <div class="code-block">
+/* 화면 너비가 768px 이하일 때 */
+@media (max-width: 768px) {
+    .flex-container {
+        flex-direction: column;  /* 세로 배치 */
+    }
+    
+    .grid-container {
+        grid-template-columns: 1fr;  /* 1열로 변경 */
+    }
+}
+            </div>
+
+            <p><strong>💡 팁:</strong> 브라우저 창 크기를 조절하면 레이아웃이 변하는 것을 확인할 수 있습니다!</p>
+        </div>
+
+        <footer style="margin-top: 50px; text-align: center; color: #7f8c8d; border-top: 1px solid #bdc3c7; padding-top: 20px;">
+            <p>CSS 기초 학습 자료 - 선택자와 스타일 속성</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">
+                제작: 을지대학교 의료IT 안건 | 을GPT팀원 전용 학습 자료
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

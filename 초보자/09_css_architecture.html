@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS 아키텍처와 방법론 - 확장 가능한 스타일 구조</title>
+    <style>
+        /* ==========================================================================
+           CSS 아키텍처 데모용 스타일
+           
+           목차:
+           1. CSS 변수 (Custom Properties)
+           2. 기본 리셋과 타이포그래피
+           3. BEM 방법론 예시
+           4. OOCSS 예시
+           5. SMACSS 구조
+           6. 컴포넌트 기반 아키텍처
+           7. 유틸리티 클래스
+           8. 반응형 디자인 시스템
+           ========================================================================== */
+
+        /* ==========================================================================
+           1. CSS 변수 (Design Tokens)
+           ========================================================================== */
+        :root {
+            /* 색상 팔레트 */
+            --color-primary-100: #e3f2fd;
+            --color-primary-300: #64b5f6;
+            --color-primary-500: #2196f3;
+            --color-primary-700: #1976d2;
+            --color-primary-900: #0d47a1;
+
+            --color-secondary-100: #f3e5f5;
+            --color-secondary-300: #ce93d8;
+            --color-secondary-500: #9c27b0;
+            --color-secondary-700: #7b1fa2;
+            --color-secondary-900: #4a148c;
+
+            --color-success-100: #e8f5e8;
+            --color-success-500: #4caf50;
+            --color-success-700: #388e3c;
+
+            --color-warning-100: #fff8e1;
+            --color-warning-500: #ff9800;
+            --color-warning-700: #f57c00;
+
+            --color-error-100: #ffebee;
+            --color-error-500: #f44336;
+            --color-error-700: #d32f2f;
+
+            --color-neutral-100: #f5f5f5;
+            --color-neutral-300: #e0e0e0;
+            --color-neutral-500: #9e9e9e;
+            --color-neutral-700: #616161;
+            --color-neutral-900: #212121;
+
+            /* 타이포그래피 */
+            --font-family-primary: 'Malgun Gothic', 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-family-mono: 'Fira Code', 'Monaco', 'Consolas', monospace;
+
+            --font-size-xs: 0.75rem;    /* 12px */
+            --font-size-sm: 0.875rem;   /* 14px */
+            --font-size-base: 1rem;     /* 16px */
+            --font-size-lg: 1.125rem;   /* 18px */
+            --font-size-xl: 1.25rem;    /* 20px */
+            --font-size-2xl: 1.5rem;    /* 24px */
+            --font-size-3xl: 1.875rem;  /* 30px */
+            --font-size-4xl: 2.25rem;   /* 36px */
+
+            --font-weight-light: 300;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-bold: 700;
+
+            --line-height-tight: 1.25;
+            --line-height-normal: 1.5;
+            --line-height-relaxed: 1.75;
+
+            /* 간격 시스템 */
+            --spacing-xs: 0.25rem;   /* 4px */
+            --spacing-sm: 0.5rem;    /* 8px */
+            --spacing-md: 1rem;      /* 16px */
+            --spacing-lg: 1.5rem;    /* 24px */
+            --spacing-xl: 2rem;      /* 32px */
+            --spacing-2xl: 3rem;     /* 48px */
+            --spacing-3xl: 4rem;     /* 64px */
+
+            /* 그림자 */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+            /* 경계선 */
+            --border-width-thin: 1px;
+            --border-width-medium: 2px;
+            --border-width-thick: 4px;
+
+            --border-radius-sm: 0.25rem;  /* 4px */
+            --border-radius-md: 0.5rem;   /* 8px */
+            --border-radius-lg: 0.75rem;  /* 12px */
+            --border-radius-xl: 1rem;     /* 16px */
+            --border-radius-full: 9999px;
+
+            /* 전환 효과 */
+            --transition-fast: 150ms ease-in-out;
+            --transition-normal: 300ms ease-in-out;
+            --transition-slow: 500ms ease-in-out;
+
+            /* 중단점 */
+            --breakpoint-sm: 640px;
+            --breakpoint-md: 768px;
+            --breakpoint-lg: 1024px;
+            --breakpoint-xl: 1280px;
+            --breakpoint-2xl: 1536px;
+        }
+
+        /* ==========================================================================
+           2. 기본 리셋과 타이포그래피
+           ========================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            line-height: var(--line-height-normal);
+            color: var(--color-neutral-900);
+            background: linear-gradient(135deg, var(--color-primary-100) 0%, var(--color-secondary-100) 100%);
+            min-height: 100vh;
+        }
+
+        /* ==========================================================================
+           3. BEM 방법론 예시 (Block__Element--Modifier)
+           ========================================================================== */
+        
+        /* Block: card */
+        .card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            transition: all var(--transition-normal);
+        }
+
+        /* Element: card__header */
+        .card__header {
+            border-bottom: var(--border-width-thin) solid var(--color-neutral-300);
+            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .card__title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-neutral-900);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .card__subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--color-neutral-500);
+        }
+
+        .card__body {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .card__footer {
+            border-top: var(--border-width-thin) solid var(--color-neutral-300);
+            padding-top: var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Modifier: card--elevated */
+        .card--elevated {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-2px);
+        }
+
+        .card--elevated:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* Modifier: card--primary */
+        .card--primary {
+            border-left: var(--border-width-thick) solid var(--color-primary-500);
+        }
+
+        .card--primary .card__title {
+            color: var(--color-primary-700);
+        }
+
+        /* Modifier: card--secondary */
+        .card--secondary {
+            border-left: var(--border-width-thick) solid var(--color-secondary-500);
+        }
+
+        .card--secondary .card__title {
+            color: var(--color-secondary-700);
+        }
+
+        /* ==========================================================================
+           4. OOCSS 예시 (Object Oriented CSS)
+           ========================================================================== */
+
+        /* 구조와 스킨 분리 */
+        
+        /* 구조 (Structure) */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: var(--border-width-medium) solid transparent;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            min-height: 44px; /* 접근성: 최소 터치 대상 크기 */
+            gap: var(--spacing-xs);
+        }
+
+        .btn:focus {
+            outline: 2px solid var(--color-primary-500);
+            outline-offset: 2px;
+        }
+
+        /* 스킨 (Skin) */
+        .btn--primary {
+            background-color: var(--color-primary-500);
+            color: white;
+        }
+
+        .btn--primary:hover {
+            background-color: var(--color-primary-700);
+            transform: translateY(-1px);
+        }
+
+        .btn--secondary {
+            background-color: var(--color-secondary-500);
+            color: white;
+        }
+
+        .btn--secondary:hover {
+            background-color: var(--color-secondary-700);
+            transform: translateY(-1px);
+        }
+
+        .btn--outline {
+            background-color: transparent;
+            border-color: var(--color-primary-500);
+            color: var(--color-primary-500);
+        }
+
+        .btn--outline:hover {
+            background-color: var(--color-primary-500);
+            color: white;
+        }
+
+        /* 크기 변형 */
+        .btn--sm {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            font-size: var(--font-size-sm);
+            min-height: 36px;
+        }
+
+        .btn--lg {
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-size: var(--font-size-lg);
+            min-height: 52px;
+        }
+
+        /* ==========================================================================
+           5. SMACSS 구조 예시
+           ========================================================================== */
+
+        /* Base Rules */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: var(--font-weight-bold);
+            line-height: var(--line-height-tight);
+            margin-bottom: var(--spacing-md);
+        }
+
+        h1 { font-size: var(--font-size-4xl); }
+        h2 { font-size: var(--font-size-3xl); }
+        h3 { font-size: var(--font-size-2xl); }
+        h4 { font-size: var(--font-size-xl); }
+
+        p {
+            margin-bottom: var(--spacing-md);
+            line-height: var(--line-height-relaxed);
+        }
+
+        /* Layout Rules */
+        .l-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+
+        .l-grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+
+        .l-grid--2col {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .l-grid--3col {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .l-flex {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .l-flex--center {
+            align-items: center;
+            justify-content: center;
+        }
+
+        .l-flex--between {
+            justify-content: space-between;
+        }
+
+        /* Module Rules */
+        .nav {
+            background: white;
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-md) 0;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .nav__list {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-lg);
+        }
+
+        .nav__link {
+            text-decoration: none;
+            color: var(--color-neutral-700);
+            font-weight: var(--font-weight-medium);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            transition: all var(--transition-fast);
+        }
+
+        .nav__link:hover,
+        .nav__link--active {
+            background-color: var(--color-primary-100);
+            color: var(--color-primary-700);
+        }
+
+        /* State Rules */
+        .is-hidden {
+            display: none !important;
+        }
+
+        .is-loading {
+            opacity: 0.6;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .is-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid var(--color-neutral-300);
+            border-top-color: var(--color-primary-500);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ==========================================================================
+           6. 컴포넌트 기반 아키텍처
+           ========================================================================== */
+
+        /* Alert 컴포넌트 */
+        .alert {
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+        }
+
+        .alert__icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+        }
+
+        .alert__content {
+            flex: 1;
+        }
+
+        .alert__title {
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .alert--success {
+            background-color: var(--color-success-100);
+            color: var(--color-success-700);
+            border-left: var(--border-width-thick) solid var(--color-success-500);
+        }
+
+        .alert--warning {
+            background-color: var(--color-warning-100);
+            color: var(--color-warning-700);
+            border-left: var(--border-width-thick) solid var(--color-warning-500);
+        }
+
+        .alert--error {
+            background-color: var(--color-error-100);
+            color: var(--color-error-700);
+            border-left: var(--border-width-thick) solid var(--color-error-500);
+        }
+
+        /* Form 컴포넌트 */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-neutral-900);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .form-label--required::after {
+            content: ' *';
+            color: var(--color-error-500);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: var(--border-width-medium) solid var(--color-neutral-300);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-base);
+            transition: border-color var(--transition-fast);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary-500);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .form-input--error {
+            border-color: var(--color-error-500);
+        }
+
+        .form-help {
+            font-size: var(--font-size-sm);
+            color: var(--color-neutral-500);
+            margin-top: var(--spacing-xs);
+        }
+
+        .form-error {
+            font-size: var(--font-size-sm);
+            color: var(--color-error-500);
+            margin-top: var(--spacing-xs);
+        }
+
+        /* ==========================================================================
+           7. 유틸리티 클래스
+           ========================================================================== */
+
+        /* Spacing */
+        .m-0 { margin: 0; }
+        .m-1 { margin: var(--spacing-xs); }
+        .m-2 { margin: var(--spacing-sm); }
+        .m-4 { margin: var(--spacing-md); }
+        .m-6 { margin: var(--spacing-lg); }
+        .m-8 { margin: var(--spacing-xl); }
+
+        .mt-0 { margin-top: 0; }
+        .mt-1 { margin-top: var(--spacing-xs); }
+        .mt-2 { margin-top: var(--spacing-sm); }
+        .mt-4 { margin-top: var(--spacing-md); }
+        .mt-6 { margin-top: var(--spacing-lg); }
+        .mt-8 { margin-top: var(--spacing-xl); }
+
+        .p-0 { padding: 0; }
+        .p-1 { padding: var(--spacing-xs); }
+        .p-2 { padding: var(--spacing-sm); }
+        .p-4 { padding: var(--spacing-md); }
+        .p-6 { padding: var(--spacing-lg); }
+        .p-8 { padding: var(--spacing-xl); }
+
+        /* Display */
+        .block { display: block; }
+        .inline { display: inline; }
+        .inline-block { display: inline-block; }
+        .flex { display: flex; }
+        .grid { display: grid; }
+        .hidden { display: none; }
+
+        /* Flexbox */
+        .flex-row { flex-direction: row; }
+        .flex-col { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .items-end { align-items: flex-end; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-around { justify-content: space-around; }
+
+        /* Text */
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-xs { font-size: var(--font-size-xs); }
+        .text-sm { font-size: var(--font-size-sm); }
+        .text-base { font-size: var(--font-size-base); }
+        .text-lg { font-size: var(--font-size-lg); }
+        .text-xl { font-size: var(--font-size-xl); }
+        .text-2xl { font-size: var(--font-size-2xl); }
+
+        .font-light { font-weight: var(--font-weight-light); }
+        .font-normal { font-weight: var(--font-weight-normal); }
+        .font-medium { font-weight: var(--font-weight-medium); }
+        .font-bold { font-weight: var(--font-weight-bold); }
+
+        .text-primary { color: var(--color-primary-500); }
+        .text-secondary { color: var(--color-secondary-500); }
+        .text-success { color: var(--color-success-500); }
+        .text-warning { color: var(--color-warning-500); }
+        .text-error { color: var(--color-error-500); }
+        .text-neutral-500 { color: var(--color-neutral-500); }
+        .text-neutral-700 { color: var(--color-neutral-700); }
+        .text-neutral-900 { color: var(--color-neutral-900); }
+
+        /* Background */
+        .bg-white { background-color: white; }
+        .bg-primary { background-color: var(--color-primary-500); }
+        .bg-secondary { background-color: var(--color-secondary-500); }
+        .bg-neutral-100 { background-color: var(--color-neutral-100); }
+
+        /* Border */
+        .border { border: var(--border-width-thin) solid var(--color-neutral-300); }
+        .border-primary { border-color: var(--color-primary-500); }
+        .border-secondary { border-color: var(--color-secondary-500); }
+        .rounded { border-radius: var(--border-radius-md); }
+        .rounded-lg { border-radius: var(--border-radius-lg); }
+        .rounded-full { border-radius: var(--border-radius-full); }
+
+        /* Shadow */
+        .shadow-sm { box-shadow: var(--shadow-sm); }
+        .shadow-md { box-shadow: var(--shadow-md); }
+        .shadow-lg { box-shadow: var(--shadow-lg); }
+        .shadow-xl { box-shadow: var(--shadow-xl); }
+
+        /* ==========================================================================
+           8. 반응형 미디어 쿼리
+           ========================================================================== */
+        @media (max-width: 768px) {
+            .l-container {
+                padding: var(--spacing-md);
+            }
+            
+            .l-grid--2col,
+            .l-grid--3col {
+                grid-template-columns: 1fr;
+            }
+            
+            .l-flex {
+                flex-direction: column;
+            }
+            
+            .nav__list {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+            
+            /* 모바일 전용 유틸리티 */
+            .md\:hidden {
+                display: none;
+            }
+            
+            .md\:text-center {
+                text-align: center;
+            }
+        }
+
+        @media (min-width: 769px) {
+            /* 데스크톱 전용 유틸리티 */
+            .lg\:flex {
+                display: flex;
+            }
+            
+            .lg\:grid-cols-3 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* ==========================================================================
+           9. 커스텀 컴포넌트 (실제 예제용)
+           ========================================================================== */
+
+        .architecture-demo {
+            background: white;
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .architecture-demo__header {
+            background: linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500));
+            color: white;
+            padding: var(--spacing-xl);
+            text-align: center;
+        }
+
+        .code-example {
+            background: var(--color-neutral-900);
+            color: var(--color-neutral-100);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            margin: var(--spacing-md) 0;
+            overflow-x: auto;
+            font-family: var(--font-family-mono);
+            font-size: var(--font-size-sm);
+            line-height: var(--line-height-relaxed);
+        }
+
+        .methodology-card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-normal);
+            border-left: var(--border-width-thick) solid var(--color-primary-500);
+        }
+
+        .methodology-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .methodology-card__title {
+            color: var(--color-primary-700);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .methodology-card__description {
+            color: var(--color-neutral-700);
+            line-height: var(--line-height-relaxed);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .methodology-card__features {
+            list-style: none;
+        }
+
+        .methodology-card__features li {
+            padding: var(--spacing-xs) 0;
+            color: var(--color-neutral-600);
+        }
+
+        .methodology-card__features li::before {
+            content: '✓';
+            color: var(--color-success-500);
+            font-weight: var(--font-weight-bold);
+            margin-right: var(--spacing-sm);
+        }
+    </style>
+</head>
+<body>
+    <div class="l-container">
+        <div class="architecture-demo">
+            <header class="architecture-demo__header">
+                <h1>CSS 아키텍처와 방법론</h1>
+                <p class="text-lg mt-2">확장 가능하고 유지보수가 쉬운 스타일 구조 만들기</p>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                    <p style="margin: 0; font-size: 1.1rem;"><strong>을지대학교 의료IT 안건</strong> 제작</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.95rem;">을GPT팀원을 위한 CSS 아키텍처 학습용 실습 파일</p>
+                </div>
+            </header>
+
+            <div class="p-8">
+                <section class="mb-8">
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">1. CSS 설계 방법론 비교</h2>
+                    
+                    <div class="l-grid l-grid--2col">
+                        <div class="methodology-card">
+                            <h3 class="methodology-card__title">BEM (Block Element Modifier)</h3>
+                            <p class="methodology-card__description">
+                                컴포넌트 기반의 명명 규칙으로, 블록-요소-수정자 구조를 사용합니다.
+                            </p>
+                            <ul class="methodology-card__features">
+                                <li>명확한 네이밍 컨벤션</li>
+                                <li>스타일 충돌 방지</li>
+                                <li>재사용 가능한 컴포넌트</li>
+                                <li>팀 협업에 유리</li>
+                            </ul>
+                            
+                            <div class="code-example">
+                                <code>/* Block */
+.card { }
+
+/* Element */
+.card__header { }
+.card__title { }
+.card__body { }
+
+/* Modifier */
+.card--primary { }
+.card--elevated { }</code>
+                            </div>
+                        </div>
+
+                        <div class="methodology-card" style="border-left-color: var(--color-secondary-500);">
+                            <h3 class="methodology-card__title" style="color: var(--color-secondary-700);">OOCSS (Object Oriented CSS)</h3>
+                            <p class="methodology-card__description">
+                                구조와 스킨을 분리하여 재사용 가능한 CSS 객체를 만드는 방법론입니다.
+                            </p>
+                            <ul class="methodology-card__features">
+                                <li>구조와 스킨 분리</li>
+                                <li>컨테이너와 콘텐츠 분리</li>
+                                <li>높은 재사용성</li>
+                                <li>성능 최적화</li>
+                            </ul>
+                            
+                            <div class="code-example">
+                                <code>/* Structure */
+.btn { padding: 12px 24px; }
+
+/* Skin */
+.btn--primary { background: blue; }
+.btn--secondary { background: gray; }
+
+/* Size */
+.btn--large { padding: 16px 32px; }</code>
+                            </div>
+                        </div>
+
+                        <div class="methodology-card" style="border-left-color: var(--color-success-500);">
+                            <h3 class="methodology-card__title" style="color: var(--color-success-700);">SMACSS (Scalable and Modular CSS)</h3>
+                            <p class="methodology-card__description">
+                                CSS를 5가지 카테고리로 분류하여 관리하는 확장 가능한 아키텍처입니다.
+                            </p>
+                            <ul class="methodology-card__features">
+                                <li>Base, Layout, Module, State, Theme</li>
+                                <li>체계적인 구조화</li>
+                                <li>확장성 보장</li>
+                                <li>명확한 역할 분담</li>
+                            </ul>
+                            
+                            <div class="code-example">
+                                <code>/* Base */
+body, h1, p { }
+
+/* Layout */
+.l-header, .l-main { }
+
+/* Module */
+.nav, .card { }
+
+/* State */
+.is-active, .is-hidden { }</code>
+                            </div>
+                        </div>
+
+                        <div class="methodology-card" style="border-left-color: var(--color-warning-500);">
+                            <h3 class="methodology-card__title" style="color: var(--color-warning-700);">Atomic CSS</h3>
+                            <p class="methodology-card__description">
+                                작은 단위의 유틸리티 클래스를 조합하여 스타일을 구성하는 방법론입니다.
+                            </p>
+                            <ul class="methodology-card__features">
+                                <li>원자 단위 클래스</li>
+                                <li>빠른 개발 속도</li>
+                                <li>일관된 디자인 시스템</li>
+                                <li>번들 크기 최적화</li>
+                            </ul>
+                            
+                            <div class="code-example">
+                                <code>/* Utility Classes */
+.m-4 { margin: 1rem; }
+.p-2 { padding: 0.5rem; }
+.text-center { text-align: center; }
+.bg-primary { background: #007bff; }</code>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">2. 실제 컴포넌트 예시</h2>
+                    
+                    <h3 class="text-xl font-medium text-primary mb-4">BEM 방법론으로 구현한 카드 컴포넌트</h3>
+                    
+                    <div class="l-grid l-grid--3col">
+                        <!-- 기본 카드 -->
+                        <div class="card">
+                            <div class="card__header">
+                                <h4 class="card__title">안건의 프로필</h4>
+                                <p class="card__subtitle">을지대학교 의료IT</p>
+                            </div>
+                            <div class="card__body">
+                                <p>의료 분야 챗봇 개발자를 꿈꾸는 의료IT 전공 학생입니다. 환자 상담 챗봇과 의료 정보 제공 시스템 개발에 관심이 많습니다.</p>
+                            </div>
+                            <div class="card__footer">
+                                <span class="text-sm text-neutral-500">2024.01.15</span>
+                                <button class="btn btn--outline btn--sm">자세히 보기</button>
+                            </div>
+                        </div>
+
+                        <!-- 강조된 카드 -->
+                        <div class="card card--primary card--elevated">
+                            <div class="card__header">
+                                <h4 class="card__title">유진우의 프로젝트</h4>
+                                <p class="card__subtitle">의료IT 웹 개발</p>
+                            </div>
+                            <div class="card__body">
+                                <p>환자 정보 관리 시스템을 웹 기술로 구현하는 프로젝트입니다. 접근성과 사용성을 중점적으로 고려하고 있습니다.</p>
+                            </div>
+                            <div class="card__footer">
+                                <span class="text-sm text-neutral-500">진행중</span>
+                                <button class="btn btn--primary btn--sm">참여하기</button>
+                            </div>
+                        </div>
+
+                        <!-- 보조 카드 -->
+                        <div class="card card--secondary">
+                            <div class="card__header">
+                                <h4 class="card__title">학습 리소스</h4>
+                                <p class="card__subtitle">을GPT팀원 공유</p>
+                            </div>
+                            <div class="card__body">
+                                <p>CSS 아키텍처와 방법론에 대한 심화 학습 자료들을 정리했습니다. 실무에서 사용되는 최신 기법들을 포함합니다.</p>
+                            </div>
+                            <div class="card__footer">
+                                <span class="text-sm text-neutral-500">공개</span>
+                                <button class="btn btn--secondary btn--sm">다운로드</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">3. OOCSS 구조와 스킨 분리</h2>
+                    
+                    <div class="alert alert--warning">
+                        <div class="alert__icon">⚠️</div>
+                        <div class="alert__content">
+                            <div class="alert__title">OOCSS 핵심 원칙</div>
+                            <p>구조(Structure)와 스킨(Skin)을 분리하여 재사용성을 높이고, 컨테이너와 콘텐츠를 독립적으로 관리합니다.</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-medium text-primary mb-4">버튼 컴포넌트 예시</h3>
+                    
+                    <div class="bg-neutral-100 p-6 rounded-lg mb-4">
+                        <div class="flex flex-wrap items-center gap-4 mb-4">
+                            <button class="btn btn--primary">Primary Button</button>
+                            <button class="btn btn--secondary">Secondary Button</button>
+                            <button class="btn btn--outline">Outline Button</button>
+                        </div>
+                        
+                        <div class="flex flex-wrap items-center gap-4 mb-4">
+                            <button class="btn btn--primary btn--sm">Small Primary</button>
+                            <button class="btn btn--secondary btn--lg">Large Secondary</button>
+                        </div>
+                        
+                        <div class="flex flex-wrap items-center gap-4">
+                            <button class="btn btn--primary is-loading">Loading...</button>
+                            <button class="btn btn--outline" disabled>Disabled</button>
+                        </div>
+                    </div>
+
+                    <div class="code-example">
+                        <code>/* 구조 정의 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid transparent;
+  border-radius: var(--border-radius-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+/* 스킨 정의 */
+.btn--primary {
+  background-color: var(--color-primary-500);
+  color: white;
+}
+
+.btn--secondary {
+  background-color: var(--color-secondary-500);
+  color: white;
+}
+
+/* 크기 변형 */
+.btn--sm { padding: var(--spacing-xs) var(--spacing-sm); }
+.btn--lg { padding: var(--spacing-md) var(--spacing-xl); }</code>
+                    </div>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">4. 실전 폼 컴포넌트</h2>
+                    
+                    <div class="l-grid l-grid--2col">
+                        <div>
+                            <h3 class="text-xl font-medium text-primary mb-4">의료IT 학생 등록 폼</h3>
+                            
+                            <form class="bg-white p-6 rounded-lg shadow-md">
+                                <div class="form-group">
+                                    <label class="form-label form-label--required" for="student-name">학생 이름</label>
+                                    <input type="text" id="student-name" class="form-input" placeholder="안건" required>
+                                    <div class="form-help">실명을 정확히 입력해주세요.</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label form-label--required" for="student-email">이메일</label>
+                                    <input type="email" id="student-email" class="form-input" placeholder="geon0078@g.eulji.ac.kr" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label form-label--required" for="student-major">전공</label>
+                                    <select id="student-major" class="form-input" required>
+                                        <option value="">선택해주세요</option>
+                                        <option value="의료IT">의료IT</option>
+                                        <option value="빅데이터의료융합">빅데이터의료융합</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="student-year">학년</label>
+                                    <input type="number" id="student-year" class="form-input" min="1" max="4" placeholder="2">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="student-intro">자기소개</label>
+                                    <textarea id="student-intro" class="form-input" rows="4" placeholder="의료IT 분야에서의 목표와 관심사를 적어주세요..."></textarea>
+                                    <div class="form-help">최대 500자까지 입력 가능합니다.</div>
+                                </div>
+
+                                <div class="flex justify-between items-center">
+                                    <button type="reset" class="btn btn--outline">초기화</button>
+                                    <button type="submit" class="btn btn--primary">등록하기</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div>
+                            <h3 class="text-xl font-medium text-primary mb-4">폼 상태 관리</h3>
+                            
+                            <div class="space-y-4">
+                                <div class="alert alert--success">
+                                    <div class="alert__icon">✅</div>
+                                    <div class="alert__content">
+                                        <div class="alert__title">등록 완료</div>
+                                        <p>학생 정보가 성공적으로 등록되었습니다.</p>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert--error">
+                                    <div class="alert__icon">❌</div>
+                                    <div class="alert__content">
+                                        <div class="alert__title">입력 오류</div>
+                                        <p>필수 항목을 모두 입력해주세요.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h4 class="text-lg font-medium text-neutral-900 mt-6 mb-3">입력 필드 상태</h4>
+                            
+                            <div class="space-y-4">
+                                <div class="form-group">
+                                    <label class="form-label">정상 상태</label>
+                                    <input type="text" class="form-input" placeholder="유진우" value="유진우">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">오류 상태</label>
+                                    <input type="email" class="form-input form-input--error" placeholder="잘못된 이메일" value="invalid-email">
+                                    <div class="form-error">올바른 이메일 형식이 아닙니다.</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">로딩 상태</label>
+                                    <input type="text" class="form-input is-loading" placeholder="검증 중..." disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">5. 유틸리티 클래스 시스템</h2>
+                    
+                    <div class="alert alert--warning">
+                        <div class="alert__icon">💡</div>
+                        <div class="alert__content">
+                            <div class="alert__title">유틸리티 클래스의 장점</div>
+                            <p>빠른 프로토타이핑, 일관된 디자인 시스템, 번들 크기 최적화가 가능합니다.</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-medium text-primary mb-4">간격 시스템 예시</h3>
+                    
+                    <div class="bg-neutral-100 p-6 rounded-lg">
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="bg-white p-4 rounded shadow-sm">
+                                <code class="text-sm">.m-1</code> - margin: 4px
+                            </div>
+                            <div class="bg-white p-4 rounded shadow-sm">
+                                <code class="text-sm">.m-2</code> - margin: 8px
+                            </div>
+                            <div class="bg-white p-4 rounded shadow-sm">
+                                <code class="text-sm">.m-4</code> - margin: 16px
+                            </div>
+                            <div class="bg-white p-4 rounded shadow-sm">
+                                <code class="text-sm">.p-6</code> - padding: 24px
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-medium text-primary mb-4 mt-6">색상 시스템</h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-primary text-white p-4 rounded text-center">
+                            <div class="font-bold">Primary</div>
+                            <div class="text-sm opacity-90">.bg-primary .text-primary</div>
+                        </div>
+                        <div class="bg-secondary text-white p-4 rounded text-center">
+                            <div class="font-bold">Secondary</div>
+                            <div class="text-sm opacity-90">.bg-secondary .text-secondary</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">6. 의료IT 실무 적용 예시</h2>
+                    
+                    <div class="alert alert--success">
+                        <div class="alert__icon">🏥</div>
+                        <div class="alert__content">
+                            <div class="alert__title">의료 시스템에서의 CSS 아키텍처</div>
+                            <p>환자 안전과 직결되는 의료 시스템에서는 일관성 있고 명확한 UI가 필수입니다.</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-medium text-primary mb-4">환자 정보 카드 시스템</h3>
+                    
+                    <div class="l-grid l-grid--3col">
+                        <div class="card card--elevated" style="border-left-color: var(--color-success-500);">
+                            <div class="card__header">
+                                <h4 class="card__title">환자 ID: P001</h4>
+                                <p class="card__subtitle text-success">안건 (27세, 남)</p>
+                            </div>
+                            <div class="card__body">
+                                <div class="text-sm space-y-1">
+                                    <div><strong>진료과:</strong> 내과</div>
+                                    <div><strong>담당의:</strong> 유진우</div>
+                                    <div><strong>입원일:</strong> 2024.01.10</div>
+                                    <div><strong>상태:</strong> <span class="text-success font-medium">안정</span></div>
+                                </div>
+                            </div>
+                            <div class="card__footer">
+                                <button class="btn btn--outline btn--sm">차트 보기</button>
+                                <button class="btn btn--primary btn--sm">진료 기록</button>
+                            </div>
+                        </div>
+
+                        <div class="card card--elevated" style="border-left-color: var(--color-warning-500);">
+                            <div class="card__header">
+                                <h4 class="card__title">환자 ID: P002</h4>
+                                <p class="card__subtitle text-warning">유진우 (35세, 여)</p>
+                            </div>
+                            <div class="card__body">
+                                <div class="text-sm space-y-1">
+                                    <div><strong>진료과:</strong> 외과</div>
+                                    <div><strong>담당의:</strong> 안건</div>
+                                    <div><strong>수술일:</strong> 2024.01.15</div>
+                                    <div><strong>상태:</strong> <span class="text-warning font-medium">관찰</span></div>
+                                </div>
+                            </div>
+                            <div class="card__footer">
+                                <button class="btn btn--outline btn--sm">수술 기록</button>
+                                <button class="btn btn--warning btn--sm">경과 관찰</button>
+                            </div>
+                        </div>
+
+                        <div class="card card--elevated" style="border-left-color: var(--color-error-500);">
+                            <div class="card__header">
+                                <h4 class="card__title">환자 ID: P003</h4>
+                                <p class="card__subtitle text-error">응급환자 (42세, 남)</p>
+                            </div>
+                            <div class="card__body">
+                                <div class="text-sm space-y-1">
+                                    <div><strong>진료과:</strong> 응급의학과</div>
+                                    <div><strong>담당의:</strong> 의료IT팀</div>
+                                    <div><strong>내원시간:</strong> 2024.01.15 15:30</div>
+                                    <div><strong>상태:</strong> <span class="text-error font-medium">응급</span></div>
+                                </div>
+                            </div>
+                            <div class="card__footer">
+                                <button class="btn btn--error btn--sm">응급 처치</button>
+                                <button class="btn btn--outline btn--sm">검사 의뢰</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <footer class="mt-8 pt-6 border-t border-neutral-300 text-center text-neutral-500">
+                    <p class="mb-2">CSS 아키텍처와 방법론 - 확장 가능한 스타일 구조</p>
+                    <p class="text-sm">
+                        제작: 을지대학교 의료IT 안건 | 을GPT팀원 전용 학습 자료
+                    </p>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 동적 클래스 토글 데모
+        function toggleCardElevation() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.classList.toggle('card--elevated');
+            });
+        }
+
+        // 로딩 상태 시뮬레이션
+        function simulateLoading(button) {
+            const originalText = button.textContent;
+            button.classList.add('is-loading');
+            button.disabled = true;
+            button.textContent = '처리 중...';
+
+            setTimeout(() => {
+                button.classList.remove('is-loading');
+                button.disabled = false;
+                button.textContent = originalText;
+            }, 2000);
+        }
+
+        // 폼 유효성 검사 예시
+        function validateForm(form) {
+            const inputs = form.querySelectorAll('.form-input[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                const errorDiv = input.parentNode.querySelector('.form-error');
+                
+                if (!input.value.trim()) {
+                    input.classList.add('form-input--error');
+                    if (errorDiv) {
+                        errorDiv.textContent = '필수 항목입니다.';
+                        errorDiv.style.display = 'block';
+                    }
+                    isValid = false;
+                } else {
+                    input.classList.remove('form-input--error');
+                    if (errorDiv) {
+                        errorDiv.style.display = 'none';
+                    }
+                }
+            });
+
+            return isValid;
+        }
+
+        // 이벤트 리스너 등록
+        document.addEventListener('DOMContentLoaded', () => {
+            // 폼 제출 이벤트
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    if (validateForm(form)) {
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        simulateLoading(submitBtn);
+                        
+                        setTimeout(() => {
+                            alert('✅ 등록이 완료되었습니다!');
+                        }, 2100);
+                    } else {
+                        alert('❌ 입력 정보를 확인해주세요.');
+                    }
+                });
+            });
+
+            // 실시간 유효성 검사
+            const inputs = document.querySelectorAll('.form-input');
+            inputs.forEach(input => {
+                input.addEventListener('blur', () => {
+                    if (input.hasAttribute('required') && !input.value.trim()) {
+                        input.classList.add('form-input--error');
+                    } else {
+                        input.classList.remove('form-input--error');
+                    }
+                });
+
+                input.addEventListener('input', () => {
+                    if (input.classList.contains('form-input--error') && input.value.trim()) {
+                        input.classList.remove('form-input--error');
+                    }
+                });
+            });
+
+            // 버튼 클릭 이벤트
+            const buttons = document.querySelectorAll('.btn:not([type="submit"])');
+            buttons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    if (!button.disabled) {
+                        simulateLoading(button);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

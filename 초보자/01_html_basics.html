@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML 기초 - 문서 구조와 기본 태그</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 0;
+        }
+        .code-example {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .output {
+            border: 2px solid #3498db;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: white;
+        }
+        .tag-name {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HTML 기초 - 문서 구조와 기본 태그</h1>
+        <div style="text-align: center; margin-bottom: 30px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
+            <p style="margin: 0; font-size: 1.1rem;"><strong>을지대학교 의료IT 안건</strong> 제작</p>
+            <p style="margin: 5px 0 0 0; font-size: 0.95rem;">을GPT팀원을 위한 HTML/CSS 학습용 실습 파일</p>
+        </div>
+
+        <div class="section">
+            <h2>1. HTML 문서의 기본 구조</h2>
+            <p>모든 HTML 문서는 다음과 같은 기본 구조를 가집니다:</p>
+            
+            <div class="code-example">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="ko"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;문서 제목&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- 문서 내용 --&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+            </div>
+
+            <h3>각 요소의 역할:</h3>
+            <ul>
+                <li><span class="tag-name">&lt;!DOCTYPE html&gt;</span>: HTML5 문서임을 선언</li>
+                <li><span class="tag-name">&lt;html&gt;</span>: HTML 문서의 루트 요소</li>
+                <li><span class="tag-name">&lt;head&gt;</span>: 문서의 메타데이터 포함</li>
+                <li><span class="tag-name">&lt;body&gt;</span>: 사용자에게 보여지는 실제 내용</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>2. 제목 태그 (Heading Tags)</h2>
+            <p>HTML에는 6단계의 제목 태그가 있습니다. h1이 가장 중요하고 큰 제목이며, h6이 가장 작은 제목입니다.</p>
+            
+            <div class="code-example">
+&lt;h1&gt;주제목 (가장 중요)&lt;/h1&gt;
+&lt;h2&gt;소제목&lt;/h2&gt;
+&lt;h3&gt;세부 제목&lt;/h3&gt;
+&lt;h4&gt;더 작은 제목&lt;/h4&gt;
+&lt;h5&gt;더더욱 작은 제목&lt;/h5&gt;
+&lt;h6&gt;가장 작은 제목&lt;/h6&gt;
+            </div>
+
+            <div class="output">
+                <h1 style="margin:10px 0;">주제목 (가장 중요)</h1>
+                <h2 style="margin:10px 0;">소제목</h2>
+                <h3 style="margin:10px 0;">세부 제목</h3>
+                <h4 style="margin:10px 0;">더 작은 제목</h4>
+                <h5 style="margin:10px 0;">더더욱 작은 제목</h5>
+                <h6 style="margin:10px 0;">가장 작은 제목</h6>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3. 단락과 줄바꿈</h2>
+            
+            <div class="code-example">
+&lt;p&gt;이것은 첫 번째 단락입니다. 
+여러 줄로 작성해도 브라우저에서는 한 줄로 표시됩니다.&lt;/p&gt;
+
+&lt;p&gt;이것은 두 번째 단락입니다.&lt;br&gt;
+br 태그를 사용하면 강제로 줄바꿈이 됩니다.&lt;/p&gt;
+            </div>
+
+            <div class="output">
+                <p>이것은 첫 번째 단락입니다. 
+                여러 줄로 작성해도 브라우저에서는 한 줄로 표시됩니다.</p>
+                
+                <p>이것은 두 번째 단락입니다.<br>
+                br 태그를 사용하면 강제로 줄바꿈이 됩니다.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>4. 텍스트 서식 태그</h2>
+            
+            <div class="code-example">
+&lt;p&gt;&lt;strong&gt;굵은 텍스트 (중요한 내용)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;기울어진 텍스트 (강조)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;u&gt;밑줄 텍스트&lt;/u&gt;&lt;/p&gt;
+&lt;p&gt;&lt;del&gt;취소선 텍스트&lt;/del&gt;&lt;/p&gt;
+&lt;p&gt;&lt;mark&gt;형광펜 효과&lt;/mark&gt;&lt;/p&gt;
+&lt;p&gt;&lt;small&gt;작은 텍스트&lt;/small&gt;&lt;/p&gt;
+&lt;p&gt;H&lt;sub&gt;2&lt;/sub&gt;O (아래 첨자)&lt;/p&gt;
+&lt;p&gt;E=mc&lt;sup&gt;2&lt;/sup&gt; (위 첨자)&lt;/p&gt;
+            </div>
+
+            <div class="output">
+                <p><strong>굵은 텍스트 (중요한 내용)</strong></p>
+                <p><em>기울어진 텍스트 (강조)</em></p>
+                <p><u>밑줄 텍스트</u></p>
+                <p><del>취소선 텍스트</del></p>
+                <p><mark>형광펜 효과</mark></p>
+                <p><small>작은 텍스트</small></p>
+                <p>H<sub>2</sub>O (아래 첨자)</p>
+                <p>E=mc<sup>2</sup> (위 첨자)</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>5. 목록 (Lists)</h2>
+            
+            <h3>순서 없는 목록 (Unordered List)</h3>
+            <div class="code-example">
+&lt;ul&gt;
+    &lt;li&gt;첫 번째 항목&lt;/li&gt;
+    &lt;li&gt;두 번째 항목&lt;/li&gt;
+    &lt;li&gt;세 번째 항목&lt;/li&gt;
+&lt;/ul&gt;
+            </div>
+
+            <div class="output">
+                <ul>
+                    <li>첫 번째 항목</li>
+                    <li>두 번째 항목</li>
+                    <li>세 번째 항목</li>
+                </ul>
+            </div>
+
+            <h3>순서 있는 목록 (Ordered List)</h3>
+            <div class="code-example">
+&lt;ol&gt;
+    &lt;li&gt;첫 번째 단계&lt;/li&gt;
+    &lt;li&gt;두 번째 단계&lt;/li&gt;
+    &lt;li&gt;세 번째 단계&lt;/li&gt;
+&lt;/ol&gt;
+            </div>
+
+            <div class="output">
+                <ol>
+                    <li>첫 번째 단계</li>
+                    <li>두 번째 단계</li>
+                    <li>세 번째 단계</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>6. 링크와 이미지</h2>
+            
+            <h3>링크 (Anchor)</h3>
+            <div class="code-example">
+&lt;a href="https://www.google.com"&gt;구글로 이동&lt;/a&gt;
+&lt;a href="https://www.naver.com" target="_blank"&gt;네이버 (새 창)&lt;/a&gt;
+&lt;a href="mailto:ahngun@eulji.ac.kr"&gt;안건에게 이메일 보내기&lt;/a&gt;
+            </div>
+
+            <div class="output">
+                <a href="https://www.google.com">구글로 이동</a><br>
+                <a href="https://www.naver.com" target="_blank">네이버 (새 창)</a><br>
+                <a href="mailto:geon0078@g.eulji.ac.kr">안건에게 이메일 보내기</a>
+            </div>
+
+            <h3>이미지</h3>
+            <div class="code-example">
+&lt;img src="이미지경로.jpg" alt="이미지 설명" width="200"&gt;
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>7. HTML 주석</h2>
+            <p>주석은 브라우저에 표시되지 않으며, 코드에 설명을 추가할 때 사용합니다.</p>
+            
+            <div class="code-example">
+&lt;!-- 이것은 주석입니다. 브라우저에 표시되지 않습니다. --&gt;
+&lt;p&gt;이것은 보이는 내용입니다.&lt;/p&gt;
+            </div>
+        </div>
+
+        <footer style="margin-top: 50px; text-align: center; color: #7f8c8d; border-top: 1px solid #bdc3c7; padding-top: 20px;">
+            <p>HTML 기초 학습 자료 - 문서 구조와 기본 태그</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">
+                제작: 을지대학교 의료IT 안건 | 을GPT팀원 전용 학습 자료
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

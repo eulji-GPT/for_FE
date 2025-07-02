@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>의료IT 챗봇 프로젝트 - 종합 실습 (Part 3 - 고급 기능)</title>
+    <style>
+        /* Part 2에서 이어지는 고급 기능 스타일 */
+        :root {
+            --color-medical-primary: #006ba6;
+            --color-medical-secondary: #0496c7;
+            --color-medical-accent: #ffb700;
+            --color-medical-success: #2e8b57;
+            --color-medical-warning: #ff6b35;
+            --color-medical-error: #dc2626;
+            --color-chart-blue: #3b82f6;
+            --color-chart-green: #10b981;
+            --color-chart-yellow: #f59e0b;
+            --color-chart-red: #ef4444;
+            --color-chart-purple: #8b5cf6;
+        }
+
+        /* 데이터 시각화 스타일 */
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-gray-800);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: end;
+            gap: 15px;
+            height: 200px;
+            padding: 20px 0;
+        }
+
+        .bar {
+            flex: 1;
+            background: var(--color-medical-primary);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            min-height: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            padding: 5px;
+        }
+
+        .bar:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: var(--color-gray-600);
+            white-space: nowrap;
+        }
+
+        .pie-chart {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--color-chart-blue) 0deg 72deg,
+                var(--color-chart-green) 72deg 144deg,
+                var(--color-chart-yellow) 144deg 216deg,
+                var(--color-chart-red) 216deg 288deg,
+                var(--color-chart-purple) 288deg 360deg
+            );
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        /* 실시간 모니터링 */
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .monitor-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .monitor-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .monitor-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--color-medical-primary);
+            margin: 10px 0;
+        }
+
+        .monitor-label {
+            font-size: 14px;
+            color: var(--color-gray-600);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .monitor-trend {
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .trend-up {
+            color: var(--color-medical-success);
+        }
+
+        .trend-down {
+            color: var(--color-medical-error);
+        }
+
+        /* 의료 알림 시스템 */
+        .notification-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .notification {
+            background: white;
+            border: 1px solid var(--color-gray-200);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--color-medical-success);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--color-medical-warning);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--color-medical-error);
+        }
+
+        .notification.info {
+            border-left: 4px solid var(--color-medical-primary);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--color-gray-400);
+        }
+
+        .notification-close:hover {
+            color: var(--color-gray-600);
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--color-gray-500);
+            margin-top: 5px;
+        }
+
+        /* 의료 진단 카드 */
+        .diagnosis-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diagnosis-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .diagnosis-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .diagnosis-content {
+            font-size: 14px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .risk-meter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .risk-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .risk-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444);
+            transition: width 0.3s ease;
+        }
+
+        /* 검색 자동완성 */
+        .search-container {
+            position: relative;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--color-gray-200);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .autocomplete-dropdown.active {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--color-gray-100);
+            transition: background-color 0.2s ease;
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: var(--color-gray-50);
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        /* 의료 타임라인 */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--color-gray-300);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 20px 0 20px 70px;
+            margin-bottom: 20px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: 20px;
+            top: 25px;
+            width: 20px;
+            height: 20px;
+            background: var(--color-medical-primary);
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 0 2px var(--color-medical-primary);
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: var(--color-gray-500);
+            margin-bottom: 5px;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: var(--color-gray-800);
+            margin-bottom: 8px;
+        }
+
+        .timeline-description {
+            font-size: 14px;
+            color: var(--color-gray-600);
+            line-height: 1.5;
+        }
+
+        /* 드래그 앤 드롭 */
+        .dropzone {
+            border: 2px dashed var(--color-gray-300);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            color: var(--color-gray-500);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dropzone:hover,
+        .dropzone.dragover {
+            border-color: var(--color-medical-primary);
+            background: var(--color-gray-50);
+            color: var(--color-medical-primary);
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: var(--color-gray-50);
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--color-medical-primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .remove-file {
+            background: var(--color-medical-error);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* 로딩 스피너 */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-gray-300);
+            border-radius: 50%;
+            border-top-color: var(--color-medical-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 토글 스위치 */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--color-gray-300);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--color-medical-primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* 반응형 그리드 */
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .grid-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* 의료 계산기 */
+        .calculator {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .calc-display {
+            background: var(--color-gray-100);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: right;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .calc-button {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calc-button.number {
+            background: var(--color-gray-100);
+            color: var(--color-gray-800);
+        }
+
+        .calc-button.operator {
+            background: var(--color-medical-primary);
+            color: white;
+        }
+
+        .calc-button.equals {
+            background: var(--color-medical-success);
+            color: white;
+        }
+
+        .calc-button.clear {
+            background: var(--color-medical-error);
+            color: white;
+        }
+
+        .calc-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* 다크 모드 토글 */
+        .dark-mode {
+            --color-gray-50: #1f2937;
+            --color-gray-100: #374151;
+            --color-gray-200: #4b5563;
+            --color-white: #1f2937;
+            --color-chat-background: #374151;
+        }
+
+        .dark-mode body {
+            background: #111827;
+            color: #f9fafb;
+        }
+
+        .dark-mode .medical-form,
+        .dark-mode .chart-container,
+        .dark-mode .monitor-card,
+        .dark-mode .grid-item,
+        .dark-mode .calculator {
+            background: #374151;
+            color: #f9fafb;
+        }
+
+        /* 접근성 개선 */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .focus-visible {
+            outline: 2px solid var(--color-medical-primary);
+            outline-offset: 2px;
+        }
+
+        /* 애니메이션 제어 */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 알림 패널 -->
+        <div class="notification-panel" id="notificationPanel">
+            <!-- 동적으로 생성되는 알림들 -->
+        </div>
+
+        <header class="chat-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="header-title">🏥 을지대 의료IT 챗봇 (고급 기능)</h1>
+                    <p class="header-subtitle">AI 기반 의료정보 분석 시스템</p>
+                </div>
+                <div class="header-right">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                        <span class="slider"></span>
+                    </label>
+                    <small>다크 모드</small>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- 실시간 모니터링 대시보드 -->
+            <section class="monitoring-section">
+                <h2>📊 실시간 의료 시스템 모니터링</h2>
+                
+                <div class="monitoring-grid">
+                    <div class="monitor-card">
+                        <div class="monitor-label">일일 환자 수</div>
+                        <div class="monitor-value" id="dailyPatients">247</div>
+                        <div class="monitor-trend trend-up">↗ +12% (전일 대비)</div>
+                    </div>
+                    
+                    <div class="monitor-card">
+                        <div class="monitor-label">응급실 대기</div>
+                        <div class="monitor-value" id="emergencyWait">8</div>
+                        <div class="monitor-trend trend-down">↘ -3명 (1시간 전)</div>
+                    </div>
+                    
+                    <div class="monitor-card">
+                        <div class="monitor-label">병상 이용률</div>
+                        <div class="monitor-value" id="bedOccupancy">87%</div>
+                        <div class="monitor-trend trend-up">↗ +2% (어제 대비)</div>
+                    </div>
+                    
+                    <div class="monitor-card">
+                        <div class="monitor-label">시스템 상태</div>
+                        <div class="monitor-value" style="color: var(--color-medical-success);">정상</div>
+                        <div class="monitor-trend">🟢 모든 시스템 작동</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 데이터 시각화 -->
+            <section class="visualization-section">
+                <h2>📈 의료 데이터 시각화</h2>
+                
+                <div class="responsive-grid">
+                    <!-- 막대 차트 -->
+                    <div class="chart-container">
+                        <div class="chart-title">주간 진료 통계</div>
+                        <div class="bar-chart" id="weeklyChart">
+                            <div class="bar" style="height: 60%;" data-value="150">
+                                150
+                                <div class="bar-label">월</div>
+                            </div>
+                            <div class="bar" style="height: 80%;" data-value="200">
+                                200
+                                <div class="bar-label">화</div>
+                            </div>
+                            <div class="bar" style="height: 70%;" data-value="175">
+                                175
+                                <div class="bar-label">수</div>
+                            </div>
+                            <div class="bar" style="height: 90%;" data-value="225">
+                                225
+                                <div class="bar-label">목</div>
+                            </div>
+                            <div class="bar" style="height: 85%;" data-value="212">
+                                212
+                                <div class="bar-label">금</div>
+                            </div>
+                            <div class="bar" style="height: 40%;" data-value="100">
+                                100
+                                <div class="bar-label">토</div>
+                            </div>
+                            <div class="bar" style="height: 30%;" data-value="75">
+                                75
+                                <div class="bar-label">일</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 파이 차트 -->
+                    <div class="chart-container">
+                        <div class="chart-title">진료과별 분포</div>
+                        <div class="pie-chart"></div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--color-chart-blue);"></div>
+                                <span>내과 (20%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--color-chart-green);"></div>
+                                <span>외과 (20%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--color-chart-yellow);"></div>
+                                <span>소아과 (20%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--color-chart-red);"></div>
+                                <span>정형외과 (20%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--color-chart-purple);"></div>
+                                <span>기타 (20%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 진단 및 위험도 평가 -->
+            <section class="diagnosis-section">
+                <h2>🩺 AI 진단 지원 시스템</h2>
+                
+                <div class="diagnosis-card">
+                    <div class="diagnosis-title">환자 위험도 평가</div>
+                    <div class="diagnosis-content">
+                        입력된 증상과 병력을 바탕으로 AI가 분석한 결과입니다.
+                        <div class="risk-meter">
+                            <span>저위험</span>
+                            <div class="risk-bar">
+                                <div class="risk-fill" style="width: 65%;"></div>
+                            </div>
+                            <span>고위험</span>
+                        </div>
+                        <strong>권장사항:</strong> 추가 검사 및 전문의 상담을 권합니다.
+                    </div>
+                </div>
+
+                <div class="medical-form">
+                    <h3>🔍 증상 기반 진단 지원</h3>
+                    
+                    <div class="search-container">
+                        <input type="text" class="form-input" id="symptomSearch" 
+                               placeholder="증상을 입력하세요 (예: 두통, 발열, 복통)"
+                               oninput="showAutocomplete(this.value)"
+                               onkeydown="handleAutocompleteKey(event)">
+                        <div class="autocomplete-dropdown" id="autocompleteDropdown">
+                            <!-- 자동완성 항목들이 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+
+                    <button class="send-button" onclick="analyzeSyDragon()">AI 진단 분석</button>
+
+                    <div id="diagnosisResult" style="display: none; margin-top: 20px;">
+                        <!-- 진단 결과가 여기에 표시됩니다 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 의료 계산기 -->
+            <section class="calculator-section">
+                <h2>🧮 의료 계산기</h2>
+                
+                <div class="responsive-grid">
+                    <div class="calculator">
+                        <h3>BMI 계산기</h3>
+                        <div class="form-group">
+                            <label class="form-label">신장 (cm)</label>
+                            <input type="number" class="form-input" id="height" placeholder="170">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">체중 (kg)</label>
+                            <input type="number" class="form-input" id="weight" placeholder="70">
+                        </div>
+                        <button class="send-button" onclick="calculateBMI()">BMI 계산</button>
+                        <div id="bmiResult" class="medical-data-display" style="display: none;">
+                            <!-- BMI 결과가 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+
+                    <div class="calculator">
+                        <h3>약물 용량 계산기</h3>
+                        <div class="form-group">
+                            <label class="form-label">환자 체중 (kg)</label>
+                            <input type="number" class="form-input" id="patientWeight" placeholder="70">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">약물 농도 (mg/ml)</label>
+                            <input type="number" class="form-input" id="drugConcentration" placeholder="10">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">처방 용량 (mg/kg)</label>
+                            <input type="number" class="form-input" id="prescribedDose" placeholder="5">
+                        </div>
+                        <button class="send-button" onclick="calculateDosage()">용량 계산</button>
+                        <div id="dosageResult" class="medical-data-display" style="display: none;">
+                            <!-- 용량 계산 결과가 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 환자 타임라인 -->
+            <section class="timeline-section">
+                <h2>📋 환자 진료 타임라인</h2>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-time">2024-01-15 09:00</div>
+                            <div class="timeline-title">초진 접수</div>
+                            <div class="timeline-description">
+                                환자가 내과 외래로 내원하여 복통을 주소로 접수함.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-time">2024-01-15 09:30</div>
+                            <div class="timeline-title">진찰 및 문진</div>
+                            <div class="timeline-description">
+                                복부 진찰 시행, 우하복부 압통 확인. 추가 검사 처방.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-time">2024-01-15 10:00</div>
+                            <div class="timeline-title">혈액검사</div>
+                            <div class="timeline-description">
+                                CBC, CRP, ESR 검사 시행. 염증 수치 상승 확인.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-time">2024-01-15 11:00</div>
+                            <div class="timeline-title">영상 검사</div>
+                            <div class="timeline-description">
+                                복부 CT 촬영 완료. 맹장염 소견 확인됨.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 파일 업로드 -->
+            <section class="upload-section">
+                <h2>📁 의료 기록 업로드</h2>
+                
+                <div class="medical-form">
+                    <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📄</div>
+                        <div>의료 기록 파일을 드래그하거나 클릭하여 업로드하세요</div>
+                        <small>지원 파일: PDF, JPG, PNG, DOCX (최대 10MB)</small>
+                    </div>
+                    
+                    <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.docx" 
+                           style="display: none;" onchange="handleFileSelect(event)">
+                    
+                    <div class="file-list" id="fileList">
+                        <!-- 업로드된 파일들이 여기에 표시됩니다 -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // 고급 기능을 위한 JavaScript 코드
+        
+        // 전역 변수
+        let uploadedFiles = [];
+        let isDarkMode = false;
+        let notifications = [];
+        
+        // 자동완성 데이터
+        const medicalSymptoms = [
+            '두통', '발열', '복통', '기침', '인후통', '근육통', '피로감', '어지럼증',
+            '구토', '설사', '변비', '호흡곤란', '가슴통증', '관절통', '발진',
+            '시야흐림', '청력저하', '수면장애', '식욕부진', '체중감소'
+        ];
+        
+        let selectedAutocompleteIndex = -1;
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAdvancedFeatures();
+            setInterval(updateRealTimeMonitoring, 10000); // 10초마다 업데이트
+            setInterval(addRandomNotification, 30000); // 30초마다 알림 추가
+        });
+
+        function initializeAdvancedFeatures() {
+            // 드래그 앤 드롭 이벤트 설정
+            setupDragAndDrop();
+            
+            // 실시간 데이터 업데이트 시작
+            updateRealTimeMonitoring();
+            
+            // 환경설정 로드
+            loadUserPreferences();
+            
+            // 초기 알림 표시
+            showNotification('success', '시스템이 정상적으로 초기화되었습니다.', '의료IT 시스템');
+        }
+
+        // 드래그 앤 드롭 설정
+        function setupDragAndDrop() {
+            const dropzone = document.getElementById('dropzone');
+            
+            dropzone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                dropzone.classList.add('dragover');
+            });
+            
+            dropzone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+            });
+            
+            dropzone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                handleFiles(files);
+            });
+        }
+
+        // 파일 선택 처리
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (validateFile(file)) {
+                    uploadedFiles.push(file);
+                    addFileToList(file);
+                    showNotification('success', `${file.name} 파일이 업로드되었습니다.`, '파일 업로드');
+                } else {
+                    showNotification('error', `${file.name} 파일은 지원되지 않는 형식입니다.`, '업로드 오류');
+                }
+            });
+        }
+
+        function validateFile(file) {
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            
+            return allowedTypes.includes(file.type) && file.size <= maxSize;
+        }
+
+        function addFileToList(file) {
+            const fileList = document.getElementById('fileList');
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <div class="file-icon">📄</div>
+                    <div>
+                        <div>${file.name}</div>
+                        <small>${formatFileSize(file.size)}</small>
+                    </div>
+                </div>
+                <button class="remove-file" onclick="removeFile('${file.name}')">삭제</button>
+            `;
+            
+            fileList.appendChild(fileItem);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function removeFile(fileName) {
+            uploadedFiles = uploadedFiles.filter(file => file.name !== fileName);
+            
+            const fileItems = document.querySelectorAll('.file-item');
+            fileItems.forEach(item => {
+                if (item.textContent.includes(fileName)) {
+                    item.remove();
+                }
+            });
+            
+            showNotification('info', `${fileName} 파일이 제거되었습니다.`, '파일 관리');
+        }
+
+        // 자동완성 기능
+        function showAutocomplete(value) {
+            const dropdown = document.getElementById('autocompleteDropdown');
+            
+            if (value.length < 2) {
+                dropdown.classList.remove('active');
+                return;
+            }
+            
+            const filtered = medicalSymptoms.filter(symptom => 
+                symptom.toLowerCase().includes(value.toLowerCase())
+            );
+            
+            if (filtered.length === 0) {
+                dropdown.classList.remove('active');
+                return;
+            }
+            
+            dropdown.innerHTML = filtered.map((symptom, index) => 
+                `<div class="autocomplete-item" onclick="selectAutocomplete('${symptom}')">${symptom}</div>`
+            ).join('');
+            
+            dropdown.classList.add('active');
+            selectedAutocompleteIndex = -1;
+        }
+
+        function selectAutocomplete(symptom) {
+            document.getElementById('symptomSearch').value = symptom;
+            document.getElementById('autocompleteDropdown').classList.remove('active');
+        }
+
+        function handleAutocompleteKey(event) {
+            const dropdown = document.getElementById('autocompleteDropdown');
+            const items = dropdown.querySelectorAll('.autocomplete-item');
+            
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                selectedAutocompleteIndex = Math.min(selectedAutocompleteIndex + 1, items.length - 1);
+                updateAutocompleteSelection(items);
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                selectedAutocompleteIndex = Math.max(selectedAutocompleteIndex - 1, -1);
+                updateAutocompleteSelection(items);
+            } else if (event.key === 'Enter' && selectedAutocompleteIndex >= 0) {
+                event.preventDefault();
+                items[selectedAutocompleteIndex].click();
+            } else if (event.key === 'Escape') {
+                dropdown.classList.remove('active');
+            }
+        }
+
+        function updateAutocompleteSelection(items) {
+            items.forEach((item, index) => {
+                item.classList.toggle('selected', index === selectedAutocompleteIndex);
+            });
+        }
+
+        // AI 진단 분석
+        function analyzeSyDragon() {
+            const symptom = document.getElementById('symptomSearch').value;
+            
+            if (!symptom.trim()) {
+                showNotification('warning', '증상을 입력해주세요.', '진단 분석');
+                return;
+            }
+            
+            // 로딩 표시
+            const button = event.target;
+            const originalText = button.textContent;
+            button.innerHTML = '<span class="loading-spinner"></span> 분석 중...';
+            button.disabled = true;
+            
+            // 시뮬레이션된 AI 분석 (실제로는 AI API 호출)
+            setTimeout(() => {
+                const result = generateDiagnosisResult(symptom);
+                showDiagnosisResult(result);
+                
+                button.textContent = originalText;
+                button.disabled = false;
+                
+                showNotification('success', 'AI 진단 분석이 완료되었습니다.', '진단 시스템');
+            }, 3000);
+        }
+
+        function generateDiagnosisResult(symptom) {
+            // 실제로는 AI 모델에서 분석 결과를 받아옴
+            const possibleCauses = {
+                '두통': ['긴장성 두통', '편두통', '부비동염', '고혈압'],
+                '발열': ['감기', '독감', '세균감염', '바이러스감염'],
+                '복통': ['소화불량', '위염', '맹장염', '장염'],
+                '기침': ['감기', '기관지염', '폐렴', '천식']
+            };
+            
+            const causes = possibleCauses[symptom] || ['일반적인 증상', '스트레스 관련', '생활습관 요인'];
+            const severity = Math.random() * 100;
+            
+            return {
+                symptom: symptom,
+                causes: causes,
+                severity: severity,
+                recommendation: severity > 70 ? '즉시 병원 방문 권장' : 
+                               severity > 40 ? '1-2일 내 병원 방문 권장' : '경과 관찰 및 휴식',
+                urgency: severity > 70 ? 'high' : severity > 40 ? 'medium' : 'low'
+            };
+        }
+
+        function showDiagnosisResult(result) {
+            const resultDiv = document.getElementById('diagnosisResult');
+            
+            resultDiv.innerHTML = `
+                <div class="medical-alert ${result.urgency === 'high' ? 'error' : result.urgency === 'medium' ? 'warning' : 'info'}">
+                    <h4>🤖 AI 진단 분석 결과</h4>
+                    <div class="data-row">
+                        <span class="data-label">입력 증상</span>
+                        <span class="data-value">${result.symptom}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">가능한 원인</span>
+                        <span class="data-value">${result.causes.join(', ')}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">심각도</span>
+                        <span class="data-value">${Math.round(result.severity)}점 / 100점</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">권장사항</span>
+                        <span class="data-value">${result.recommendation}</span>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <small>⚠️ 이 결과는 AI 분석에 기반한 참고용 정보입니다. 정확한 진단을 위해서는 반드시 전문의와 상담하시기 바랍니다.</small>
+                    </div>
+                </div>
+            `;
+            
+            resultDiv.style.display = 'block';
+        }
+
+        // BMI 계산
+        function calculateBMI() {
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            
+            if (!height || !weight || height <= 0 || weight <= 0) {
+                showNotification('warning', '올바른 신장과 체중을 입력해주세요.', 'BMI 계산');
+                return;
+            }
+            
+            const heightInMeters = height / 100;
+            const bmi = weight / (heightInMeters * heightInMeters);
+            const category = getBMICategory(bmi);
+            
+            const resultDiv = document.getElementById('bmiResult');
+            resultDiv.innerHTML = `
+                <div class="data-row">
+                    <span class="data-label">BMI 지수</span>
+                    <span class="data-value">${bmi.toFixed(1)} kg/m²</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">분류</span>
+                    <span class="data-value">${category.name}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">권장사항</span>
+                    <span class="data-value">${category.advice}</span>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+            
+            showNotification('success', `BMI 계산이 완료되었습니다. (${bmi.toFixed(1)})`, 'BMI 계산기');
+        }
+
+        function getBMICategory(bmi) {
+            if (bmi < 18.5) {
+                return { name: '저체중', advice: '체중 증가가 필요합니다.' };
+            } else if (bmi < 25) {
+                return { name: '정상체중', advice: '현재 체중을 유지하세요.' };
+            } else if (bmi < 30) {
+                return { name: '과체중', advice: '체중 감량을 권장합니다.' };
+            } else {
+                return { name: '비만', advice: '적극적인 체중 관리가 필요합니다.' };
+            }
+        }
+
+        // 약물 용량 계산
+        function calculateDosage() {
+            const weight = parseFloat(document.getElementById('patientWeight').value);
+            const concentration = parseFloat(document.getElementById('drugConcentration').value);
+            const dose = parseFloat(document.getElementById('prescribedDose').value);
+            
+            if (!weight || !concentration || !dose || weight <= 0 || concentration <= 0 || dose <= 0) {
+                showNotification('warning', '모든 값을 올바르게 입력해주세요.', '용량 계산');
+                return;
+            }
+            
+            const totalDose = weight * dose; // mg
+            const volume = totalDose / concentration; // ml
+            
+            const resultDiv = document.getElementById('dosageResult');
+            resultDiv.innerHTML = `
+                <div class="data-row">
+                    <span class="data-label">총 투여량</span>
+                    <span class="data-value">${totalDose.toFixed(1)} mg</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">투여 용량</span>
+                    <span class="data-value">${volume.toFixed(2)} ml</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">환자 체중</span>
+                    <span class="data-value">${weight} kg</span>
+                </div>
+                <div style="margin-top: 10px;">
+                    <small>⚠️ 투여 전 반드시 의료진의 확인을 받으시기 바랍니다.</small>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+            
+            showNotification('success', '약물 용량 계산이 완료되었습니다.', '용량 계산기');
+        }
+
+        // 실시간 모니터링 업데이트
+        function updateRealTimeMonitoring() {
+            // 시뮬레이션된 실시간 데이터
+            const dailyPatients = Math.floor(Math.random() * 50) + 220;
+            const emergencyWait = Math.floor(Math.random() * 10) + 3;
+            const bedOccupancy = Math.floor(Math.random() * 20) + 75;
+            
+            document.getElementById('dailyPatients').textContent = dailyPatients;
+            document.getElementById('emergencyWait').textContent = emergencyWait;
+            document.getElementById('bedOccupancy').textContent = bedOccupancy + '%';
+            
+            // 차트 데이터도 업데이트
+            updateChartData();
+        }
+
+        function updateChartData() {
+            const bars = document.querySelectorAll('.bar');
+            bars.forEach(bar => {
+                const currentValue = parseInt(bar.getAttribute('data-value'));
+                const variation = Math.floor(Math.random() * 20) - 10; // -10 ~ +10
+                const newValue = Math.max(50, currentValue + variation);
+                
+                bar.setAttribute('data-value', newValue);
+                bar.textContent = newValue;
+                bar.style.height = Math.min(100, (newValue / 250) * 100) + '%';
+            });
+        }
+
+        // 알림 시스템
+        function showNotification(type, message, title = '') {
+            const notification = {
+                id: Date.now(),
+                type: type,
+                message: message,
+                title: title,
+                timestamp: new Date()
+            };
+            
+            notifications.push(notification);
+            renderNotification(notification);
+            
+            // 5초 후 자동 제거
+            setTimeout(() => removeNotification(notification.id), 5000);
+        }
+
+        function renderNotification(notification) {
+            const panel = document.getElementById('notificationPanel');
+            const notificationEl = document.createElement('div');
+            notificationEl.className = `notification ${notification.type}`;
+            notificationEl.setAttribute('data-id', notification.id);
+            
+            notificationEl.innerHTML = `
+                <button class="notification-close" onclick="removeNotification(${notification.id})">&times;</button>
+                <div><strong>${notification.title}</strong></div>
+                <div>${notification.message}</div>
+                <div class="notification-time">${formatTime(notification.timestamp)}</div>
+            `;
+            
+            panel.appendChild(notificationEl);
+        }
+
+        function removeNotification(id) {
+            const notification = document.querySelector(`[data-id="${id}"]`);
+            if (notification) {
+                notification.remove();
+            }
+            notifications = notifications.filter(n => n.id !== id);
+        }
+
+        function addRandomNotification() {
+            const types = ['success', 'info', 'warning'];
+            const messages = [
+                '새로운 환자가 접수되었습니다.',
+                '검사 결과가 업데이트되었습니다.',
+                '시스템 백업이 완료되었습니다.',
+                '응급실 대기환자가 증가했습니다.',
+                '정기 점검이 예정되어 있습니다.'
+            ];
+            
+            const type = types[Math.floor(Math.random() * types.length)];
+            const message = messages[Math.floor(Math.random() * messages.length)];
+            
+            showNotification(type, message, '시스템 알림');
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // 다크모드 토글
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            
+            localStorage.setItem('darkMode', isDarkMode);
+            showNotification('info', `다크모드가 ${isDarkMode ? '활성화' : '비활성화'}되었습니다.`, '설정');
+        }
+
+        // 사용자 설정 로드
+        function loadUserPreferences() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            
+            if (darkMode) {
+                document.getElementById('darkModeToggle').checked = true;
+                toggleDarkMode();
+            }
+        }
+
+        // 접근성 개선
+        document.addEventListener('keydown', function(event) {
+            // 탭 키 네비게이션 개선
+            if (event.key === 'Tab') {
+                document.querySelector(':focus')?.classList.add('focus-visible');
+            }
+        });
+
+        // 페이지 가시성 변경 시 처리
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // 페이지가 숨겨졌을 때 불필요한 업데이트 중지
+                console.log('페이지가 비활성화되었습니다.');
+            } else {
+                // 페이지가 다시 보일 때 데이터 갱신
+                updateRealTimeMonitoring();
+                showNotification('info', '페이지가 활성화되어 데이터를 갱신했습니다.', '시스템');
+            }
+        });
+    </script>
+</body>
+</html>

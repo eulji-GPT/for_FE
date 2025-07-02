@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>반응형 웹 디자인 - 모든 기기에 최적화</title>
+    <style>
+        /* CSS 변수 정의 */
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow: 0 5px 15px rgba(0,0,0,0.1);
+            --shadow-hover: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* 헤더 스타일 */
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 3px solid var(--primary-color);
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: var(--text-light);
+        }
+
+        /* 섹션 공통 스타일 */
+        .section {
+            margin-bottom: 50px;
+            padding: 30px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            color: var(--text-dark);
+            border-left: 5px solid var(--primary-color);
+            padding-left: 15px;
+            margin-bottom: 20px;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+        }
+
+        h3 {
+            color: var(--text-dark);
+            margin: 25px 0 15px 0;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+        }
+
+        /* 코드 블록 */
+        .code-block {
+            background: var(--text-dark);
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+        }
+
+        /* 예제 컨테이너 */
+        .demo-container {
+            border: 2px solid var(--primary-color);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: white;
+        }
+
+        /* 반응형 그리드 시스템 */
+        .responsive-grid {
+            display: grid;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .grid-1 { grid-template-columns: 1fr; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        .grid-item {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 유연한 카드 시스템 */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, var(--accent-color), var(--primary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            font-weight: bold;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            margin: 0 0 10px 0;
+            color: var(--text-dark);
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+        }
+
+        .card-text {
+            color: var(--text-light);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            line-height: 1.6;
+        }
+
+        /* 반응형 네비게이션 */
+        .navbar {
+            background: linear-gradient(45deg, var(--text-dark), #636e72);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .navbar-brand {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: bold;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .navbar-item {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .navbar-item:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* 반응형 테이블 */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            min-width: 600px;
+        }
+
+        thead {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: clamp(0.8rem, 2vw, 1rem);
+        }
+
+        tbody tr:hover {
+            background-color: var(--bg-light);
+        }
+
+        /* 반응형 폼 */
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin: 20px 0;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--text-dark);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        input, textarea, select {
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* 이미지 반응형 */
+        .image-responsive {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(102, 126, 234, 0.8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-container:hover .image-overlay {
+            opacity: 1;
+        }
+
+        /* 반응형 유틸리티 클래스 */
+        .hide-mobile { display: block; }
+        .show-mobile { display: none; }
+
+        /* 데스크톱 - 1200px 이상 */
+        @media (min-width: 1200px) {
+            .form-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* 태블릿 - 768px ~ 1199px */
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* 모바일 - 767px 이하 */
+        @media (max-width: 767px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+                border-radius: 10px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .navbar-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .navbar-menu {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .hide-mobile {
+                display: none;
+            }
+            
+            .show-mobile {
+                display: block;
+            }
+            
+            .code-block {
+                font-size: 0.8rem;
+                padding: 15px;
+            }
+        }
+
+        /* 초소형 모바일 - 480px 이하 */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .section {
+                margin-bottom: 30px;
+                padding: 15px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .card-content {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 10px;
+            }
+        }
+
+        /* 고해상도 화면 - 1400px 이상 */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1600px;
+            }
+            
+            .form-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* 프린트 스타일 */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .navbar, .btn {
+                display: none;
+            }
+            
+            .section {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+
+        /* 다크 모드 대응 */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-dark: #ecf0f1;
+                --text-light: #bdc3c7;
+                --bg-light: #34495e;
+                --border-color: #5a6c7d;
+            }
+            
+            body {
+                background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            }
+            
+            .container {
+                background: #2c3e50;
+                color: var(--text-dark);
+            }
+            
+            .card, .form-container {
+                background: #34495e;
+            }
+        }
+
+        /* 애니메이션 성능 최적화 */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>반응형 웹 디자인</h1>
+            <p class="subtitle">모든 기기에서 완벽하게 보이는 웹사이트 만들기</p>
+            <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; border-radius: 8px;">
+                <p style="margin: 0; font-size: 1.1rem;"><strong>을지대학교 의료IT 안건</strong> 제작</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.95rem;">을GPT팀원을 위한 HTML/CSS 학습용 실습 파일</p>
+            </div>
+        </header>
+
+        <div class="section">
+            <h2>1. 반응형 디자인이란?</h2>
+            <p>반응형 웹 디자인(Responsive Web Design)은 다양한 화면 크기와 기기에서 최적의 사용자 경험을 제공하는 웹 디자인 접근법입니다.</p>
+            
+            <div class="code-block">
+/* 기본 메타 태그 - 반드시 포함! */
+&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+
+/* CSS 미디어 쿼리 */
+@media (max-width: 768px) {
+    /* 모바일 스타일 */
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* 태블릿 스타일 */
+}
+
+@media (min-width: 1025px) {
+    /* 데스크톱 스타일 */
+}
+            </div>
+
+            <h3>📱 주요 브레이크포인트</h3>
+            <div class="demo-container">
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 10px; margin: 5px 0; background: #e3f2fd; border-radius: 5px;">
+                        <strong>모바일:</strong> 320px ~ 767px
+                    </li>
+                    <li style="padding: 10px; margin: 5px 0; background: #f3e5f5; border-radius: 5px;">
+                        <strong>태블릿:</strong> 768px ~ 1023px
+                    </li>
+                    <li style="padding: 10px; margin: 5px 0; background: #e8f5e8; border-radius: 5px;">
+                        <strong>데스크톱:</strong> 1024px ~ 1199px
+                    </li>
+                    <li style="padding: 10px; margin: 5px 0; background: #fff3e0; border-radius: 5px;">
+                        <strong>대형 화면:</strong> 1200px 이상
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2. 유연한 그리드 시스템</h2>
+            <p>CSS Grid와 Flexbox를 활용한 반응형 그리드 시스템입니다.</p>
+            
+            <div class="code-block">
+/* 반응형 그리드 */
+.responsive-grid {
+    display: grid;
+    gap: 20px;
+}
+
+/* 데스크톱 */
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* 태블릿 */
+@media (max-width: 1023px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 모바일 */
+@media (max-width: 767px) {
+    .grid-4 { grid-template-columns: 1fr; }
+}
+            </div>
+
+            <div class="demo-container">
+                <h4>브라우저 크기를 조절해 보세요!</h4>
+                
+                <h5>4열 → 2열 → 1열</h5>
+                <div class="responsive-grid grid-4">
+                    <div class="grid-item">아이템 1</div>
+                    <div class="grid-item">아이템 2</div>
+                    <div class="grid-item">아이템 3</div>
+                    <div class="grid-item">아이템 4</div>
+                </div>
+
+                <h5>3열 → 1열</h5>
+                <div class="responsive-grid grid-3">
+                    <div class="grid-item">아이템 A</div>
+                    <div class="grid-item">아이템 B</div>
+                    <div class="grid-item">아이템 C</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3. 반응형 카드 레이아웃</h2>
+            <p>Auto-fit과 minmax를 사용한 완전 자동 반응형 카드 시스템입니다.</p>
+            
+            <div class="code-block">
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* 300px 미만으로는 줄어들지 않고, 
+   공간이 있으면 자동으로 확장됩니다 */
+            </div>
+
+            <div class="demo-container">
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-image">🖼️ 반응형 이미지</div>
+                        <div class="card-content">
+                            <h3 class="card-title">Auto-fit 그리드</h3>
+                            <p class="card-text">화면 크기에 따라 자동으로 열 개수가 조절됩니다. 최소 300px 너비를 유지합니다.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-image">📱 모바일 최적화</div>
+                        <div class="card-content">
+                            <h3 class="card-title">모바일 친화적</h3>
+                            <p class="card-text">작은 화면에서는 1열로, 큰 화면에서는 여러 열로 자동 배치됩니다.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-image">💻 데스크톱 지원</div>
+                        <div class="card-content">
+                            <h3 class="card-title">유연한 확장</h3>
+                            <p class="card-text">사용 가능한 공간을 효율적으로 활용하여 최적의 사용자 경험을 제공합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>4. 반응형 네비게이션</h2>
+            <p>화면 크기에 따라 레이아웃이 변하는 네비게이션 바입니다.</p>
+            
+            <div class="code-block">
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* 모바일에서는 세로 배치 */
+@media (max-width: 767px) {
+    .navbar-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .navbar-menu {
+        width: 100%;
+        justify-content: center;
+    }
+}
+            </div>
+
+            <div class="demo-container">
+                <nav class="navbar">
+                    <div class="navbar-container">
+                        <div class="navbar-brand">My Website</div>
+                        <div class="navbar-menu">
+                            <a href="#" class="navbar-item">홈</a>
+                            <a href="#" class="navbar-item">소개</a>
+                            <a href="#" class="navbar-item">서비스</a>
+                            <a href="#" class="navbar-item">포트폴리오</a>
+                            <a href="#" class="navbar-item">연락처</a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>5. 반응형 폼</h2>
+            <p>화면 크기에 따라 열 개수가 조절되는 스마트 폼입니다.</p>
+            
+            <div class="code-block">
+.form-grid {
+    display: grid;
+    gap: 20px;
+}
+
+/* 데스크톱: 3열 */
+@media (min-width: 1200px) {
+    .form-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* 태블릿: 2열 */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .form-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 모바일: 1열 */
+@media (max-width: 767px) {
+    .form-grid { grid-template-columns: 1fr; }
+}
+            </div>
+
+            <div class="demo-container">
+                <div class="form-container">
+                    <h3>회원가입 폼</h3>
+                    <form>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="firstName">이름</label>
+                                <input type="text" id="firstName" placeholder="안건">
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">성</label>
+                                <input type="text" id="lastName" placeholder="을지">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">이메일</label>
+                                <input type="email" id="email" placeholder="ahngun@eulji.ac.kr">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">전화번호</label>
+                                <input type="tel" id="phone" placeholder="010-1234-5678">
+                            </div>
+                            <div class="form-group">
+                                <label for="birthdate">생년월일</label>
+                                <input type="date" id="birthdate">
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">전공</label>
+                                <select id="gender">
+                                    <option>선택해주세요</option>
+                                    <option>의료IT</option>
+                                    <option>보건의료정보</option>
+                                    <option>의생명융합학과</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <div class="form-group">
+                                <label for="message">자기소개</label>
+                                <textarea id="message" rows="4" placeholder="간단한 자기소개를 작성해주세요"></textarea>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button type="submit" class="btn">가입하기</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>6. 반응형 테이블</h2>
+            <p>작은 화면에서는 가로 스크롤이 가능한 테이블입니다.</p>
+            
+            <div class="code-block">
+.table-responsive {
+    overflow-x: auto;  /* 가로 스크롤 */
+}
+
+table {
+    min-width: 600px;  /* 최소 너비 설정 */
+    width: 100%;
+}
+
+/* 모바일에서 글자 크기 조절 */
+@media (max-width: 767px) {
+    th, td {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
+            </div>
+
+            <div class="demo-container">
+                <h4>학생 성적 관리</h4>
+                <p class="show-mobile" style="color: var(--text-light); font-size: 0.9rem;">
+                    📱 작은 화면에서는 테이블을 좌우로 스크롤할 수 있습니다.
+                </p>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>학번</th>
+                                <th>이름</th>
+                                <th>전공</th>
+                                <th>HTML/CSS</th>
+                                <th>JavaScript</th>
+                                <th>React</th>
+                                <th>평균</th>
+                                <th>학점</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2021001</td>
+                                <td>안건</td>
+                                <td>의료IT</td>
+                                <td>95</td>
+                                <td>88</td>
+                                <td>92</td>
+                                <td>91.7</td>
+                                <td>A</td>
+                            </tr>
+                            <tr>
+                                <td>2021002</td>
+                                <td>유진우</td>
+                                <td>의료IT</td>
+                                <td>87</td>
+                                <td>94</td>
+                                <td>89</td>
+                                <td>90.0</td>
+                                <td>A</td>
+                            </tr>
+                            <tr>
+                                <td>2021003</td>
+                                <td>안건</td>
+                                <td>의료IT</td>
+                                <td>92</td>
+                                <td>85</td>
+                                <td>88</td>
+                                <td>88.3</td>
+                                <td>B+</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>7. 고급 반응형 기법</h2>
+            
+            <h3>CSS clamp() 함수</h3>
+            <p>최소값, 선호값, 최대값을 설정하여 유연한 크기 조절이 가능합니다.</p>
+            
+            <div class="code-block">
+/* 폰트 크기 반응형 */
+h1 { font-size: clamp(2rem, 5vw, 3rem); }
+
+/* 최소 2rem, 화면 크기의 5%, 최대 3rem */
+
+/* 컨테이너 너비 */
+.container { 
+    width: clamp(300px, 90vw, 1400px); 
+    margin: 0 auto; 
+}
+            </div>
+
+            <h3>CSS 변수와 미디어 쿼리</h3>
+            <div class="code-block">
+:root {
+    --font-size: 1rem;
+    --padding: 20px;
+}
+
+@media (max-width: 767px) {
+    :root {
+        --font-size: 0.9rem;
+        --padding: 15px;
+    }
+}
+
+.element {
+    font-size: var(--font-size);
+    padding: var(--padding);
+}
+            </div>
+
+            <h3>Container Queries (최신 기법)</h3>
+            <div class="code-block">
+/* 컨테이너의 크기에 따른 스타일 */
+.card-container {
+    container-type: inline-size;
+}
+
+@container (min-width: 400px) {
+    .card {
+        display: flex;
+        align-items: center;
+    }
+}
+            </div>
+
+            <h3>화면 방향 대응</h3>
+            <div class="code-block">
+/* 세로 방향 */
+@media (orientation: portrait) {
+    .container { padding: 10px; }
+}
+
+/* 가로 방향 */
+@media (orientation: landscape) {
+    .navbar { position: fixed; top: 0; }
+}
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>8. 접근성과 사용성</h2>
+            
+            <h3>🎯 반응형 디자인 체크리스트</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #27ae60;">
+                    <h4 style="color: #27ae60; margin-top: 0;">✅ 필수 사항</h4>
+                    <ul style="font-size: 0.9rem; color: var(--text-dark);">
+                        <li>Viewport 메타 태그</li>
+                        <li>유연한 이미지</li>
+                        <li>터치 친화적 버튼</li>
+                        <li>읽기 쉬운 글자 크기</li>
+                    </ul>
+                </div>
+                
+                <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db;">
+                    <h4 style="color: #3498db; margin-top: 0;">📱 모바일 최적화</h4>
+                    <ul style="font-size: 0.9rem; color: var(--text-dark);">
+                        <li>최소 44px 터치 영역</li>
+                        <li>가로 스크롤 방지</li>
+                        <li>빠른 로딩 속도</li>
+                        <li>간단한 네비게이션</li>
+                    </ul>
+                </div>
+                
+                <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                    <h4 style="color: #e74c3c; margin-top: 0;">⚠️ 주의사항</h4>
+                    <ul style="font-size: 0.9rem; color: var(--text-dark);">
+                        <li>고정 너비 사용 금지</li>
+                        <li>Flash, 플러그인 의존 금지</li>
+                        <li>작은 글자 크기 금지</li>
+                        <li>너무 많은 브레이크포인트</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🔧 개발 도구 추천</h3>
+            <div class="demo-container">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="text-align: center; padding: 15px;">
+                        <div style="font-size: 2rem;">🌐</div>
+                        <strong>Chrome DevTools</strong><br>
+                        <small>Device Toolbar로 다양한 화면 크기 테스트</small>
+                    </div>
+                    <div style="text-align: center; padding: 15px;">
+                        <div style="font-size: 2rem;">📱</div>
+                        <strong>Responsive Design Mode</strong><br>
+                        <small>Firefox의 반응형 디자인 모드</small>
+                    </div>
+                    <div style="text-align: center; padding: 15px;">
+                        <div style="font-size: 2rem;">🔍</div>
+                        <strong>BrowserStack</strong><br>
+                        <small>실제 기기에서의 테스트</small>
+                    </div>
+                    <div style="text-align: center; padding: 15px;">
+                        <div style="font-size: 2rem;">📊</div>
+                        <strong>Google PageSpeed</strong><br>
+                        <small>모바일 성능 측정</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer style="margin-top: 50px; text-align: center; color: var(--text-light); border-top: 1px solid var(--border-color); padding-top: 20px;">
+            <p>반응형 웹 디자인 완전 가이드 - 모든 기기에서 완벽한 사용자 경험</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">
+                제작: 을지대학교 의료IT 안건 | 을GPT팀원 전용 학습 자료
+            </p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">
+                <span class="hide-mobile">💻 데스크톱 버전으로 보고 계신 것 같네요!</span>
+                <span class="show-mobile">📱 모바일 버전으로 잘 보고 계시네요!</span>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
