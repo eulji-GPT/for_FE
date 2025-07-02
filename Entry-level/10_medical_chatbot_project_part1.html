@@ -3,294 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>의료IT 챗봇 프로젝트 - 종합 실습 (Part 1)</title>
+    <title>챗봇 프로젝트 - Part 1: 기본 구조</title>
     <style>
         /* ==========================================================================
-           의료IT 챗봇 프로젝트 종합 실습 스타일
-           
-           목차:
-           1. CSS 변수와 디자인 토큰
-           2. 기본 리셋과 레이아웃
-           3. 챗봇 UI 컴포넌트
-           4. 의료 정보 카드 시스템
-           5. 반응형 디자인
+           Part 1: 기본 CSS 변수와 레이아웃
+           목표: CSS 변수, 기본 리셋, 컨테이너 시스템 학습
            ========================================================================== */
 
-        /* ==========================================================================
-           1. CSS 변수와 디자인 토큰 (의료 시스템 테마)
-           ========================================================================== */
         :root {
             /* 의료 시스템 색상 팔레트 */
-            --color-medical-primary: #006ba6;      /* 의료 블루 */
-            --color-medical-secondary: #0496c7;    /* 밝은 의료 블루 */
-            --color-medical-accent: #ffb700;       /* 경고 오렌지 */
-            --color-medical-success: #2e8b57;      /* 의료 그린 */
-            --color-medical-warning: #ff6b35;      /* 주의 오렌지 */
-            --color-medical-error: #dc2626;        /* 응급 레드 */
-            --color-medical-info: #3b82f6;         /* 정보 블루 */
-
-            /* 챗봇 UI 색상 */
-            --color-chat-user: #4f46e5;           /* 사용자 메시지 */
-            --color-chat-bot: #10b981;            /* 봇 메시지 */
-            --color-chat-system: #6b7280;         /* 시스템 메시지 */
-            --color-chat-background: #f8fafc;     /* 채팅 배경 */
-
-            /* 뉴트럴 컬러 */
+            --color-medical-primary: #006ba6;
+            --color-medical-secondary: #0496c7;
+            --color-medical-success: #2e8b57;
+            --color-medical-error: #dc2626;
+            
+            /* 기본 색상 */
             --color-white: #ffffff;
-            --color-gray-50: #f9fafb;
             --color-gray-100: #f3f4f6;
             --color-gray-200: #e5e7eb;
-            --color-gray-300: #d1d5db;
-            --color-gray-400: #9ca3af;
-            --color-gray-500: #6b7280;
             --color-gray-600: #4b5563;
-            --color-gray-700: #374151;
-            --color-gray-800: #1f2937;
             --color-gray-900: #111827;
-
+            
             /* 타이포그래피 */
-            --font-family-primary: 'Malgun Gothic', 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-family-mono: 'Fira Code', 'Monaco', 'Consolas', monospace;
-            --font-family-medical: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-
-            --font-size-xs: 0.75rem;    /* 12px */
-            --font-size-sm: 0.875rem;   /* 14px */
-            --font-size-base: 1rem;     /* 16px */
-            --font-size-lg: 1.125rem;   /* 18px */
-            --font-size-xl: 1.25rem;    /* 20px */
-            --font-size-2xl: 1.5rem;    /* 24px */
-            --font-size-3xl: 1.875rem;  /* 30px */
-            --font-size-4xl: 2.25rem;   /* 36px */
-
-            --font-weight-light: 300;
+            --font-family-medical: 'Malgun Gothic', sans-serif;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-4xl: 2.25rem;
             --font-weight-normal: 400;
-            --font-weight-medium: 500;
             --font-weight-semibold: 600;
             --font-weight-bold: 700;
-
-            --line-height-tight: 1.25;
-            --line-height-normal: 1.5;
-            --line-height-relaxed: 1.75;
-
+            
             /* 간격 시스템 */
-            --spacing-1: 0.25rem;   /* 4px */
-            --spacing-2: 0.5rem;    /* 8px */
-            --spacing-3: 0.75rem;   /* 12px */
-            --spacing-4: 1rem;      /* 16px */
-            --spacing-5: 1.25rem;   /* 20px */
-            --spacing-6: 1.5rem;    /* 24px */
-            --spacing-8: 2rem;      /* 32px */
-            --spacing-10: 2.5rem;   /* 40px */
-            --spacing-12: 3rem;     /* 48px */
-            --spacing-16: 4rem;     /* 64px */
-
-            /* 그림자 시스템 */
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-
-            /* 테두리 */
-            --border-width: 1px;
-            --border-width-2: 2px;
-            --border-width-4: 4px;
-
-            --border-radius-sm: 0.25rem;  /* 4px */
-            --border-radius-md: 0.375rem; /* 6px */
-            --border-radius-lg: 0.5rem;   /* 8px */
-            --border-radius-xl: 0.75rem;  /* 12px */
-            --border-radius-2xl: 1rem;    /* 16px */
-            --border-radius-3xl: 1.5rem;  /* 24px */
-            --border-radius-full: 9999px;
-
-            /* 전환 효과 */
-            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
-
-            /* 중단점 */
-            --breakpoint-sm: 640px;
-            --breakpoint-md: 768px;
-            --breakpoint-lg: 1024px;
-            --breakpoint-xl: 1280px;
-            --breakpoint-2xl: 1536px;
-
-            /* 의료 시스템 특화 변수 */
-            --medical-card-padding: var(--spacing-6);
-            --medical-card-border-radius: var(--border-radius-xl);
-            --medical-priority-height: 4px;
-            --chat-message-max-width: 70%;
-            --chat-input-height: 60px;
+            --spacing-2: 0.5rem;
+            --spacing-4: 1rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            
+            /* 기타 */
+            --border-radius-xl: 0.75rem;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        /* ==========================================================================
-           2. 기본 리셋과 레이아웃
-           ========================================================================== */
+        /* 기본 리셋 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html {
-            font-size: 16px;
-            scroll-behavior: smooth;
-        }
-
         body {
             font-family: var(--font-family-medical);
-            line-height: var(--line-height-normal);
             color: var(--color-gray-900);
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
         }
 
-        /* 컨테이너 */
+        /* 컨테이너 시스템 */
         .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: var(--spacing-6);
-        }
-
-        /* 그리드 레이아웃 */
-        .grid {
-            display: grid;
-            gap: var(--spacing-6);
-        }
-
-        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-
-        /* 플렉스 레이아웃 */
-        .flex {
-            display: flex;
-        }
-
-        .flex-col {
-            flex-direction: column;
-        }
-
-        .flex-wrap {
-            flex-wrap: wrap;
-        }
-
-        .items-center {
-            align-items: center;
-        }
-
-        .items-start {
-            align-items: flex-start;
-        }
-
-        .items-end {
-            align-items: flex-end;
-        }
-
-        .justify-center {
-            justify-content: center;
-        }
-
-        .justify-between {
-            justify-content: space-between;
-        }
-
-        .justify-end {
-            justify-content: flex-end;
-        }
-
-        .gap-2 { gap: var(--spacing-2); }
-        .gap-3 { gap: var(--spacing-3); }
-        .gap-4 { gap: var(--spacing-4); }
-        .gap-6 { gap: var(--spacing-6); }
-        .gap-8 { gap: var(--spacing-8); }
-
-        /* ==========================================================================
-           3. 챗봇 UI 기본 컴포넌트
-           ========================================================================== */
-
-        /* 메인 챗봇 컨테이너 */
-        .chatbot-container {
-            background: var(--color-white);
-            border-radius: var(--border-radius-2xl);
-            box-shadow: var(--shadow-2xl);
-            overflow: hidden;
             max-width: 900px;
             margin: 0 auto;
-            height: 80vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* 챗봇 헤더 */
-        .chatbot-header {
-            background: linear-gradient(135deg, var(--color-medical-primary), var(--color-medical-secondary));
-            color: var(--color-white);
             padding: var(--spacing-6);
+        }
+
+        /* 헤더 스타일 */
+        .page-header {
             text-align: center;
-            position: relative;
+            margin-bottom: var(--spacing-8);
         }
 
-        .chatbot-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--color-medical-accent), var(--color-medical-success));
-        }
-
-        .chatbot-title {
-            font-size: var(--font-size-2xl);
-            font-weight: var(--font-weight-bold);
+        .page-title {
+            font-size: var(--font-size-4xl);
+            color: var(--color-medical-primary);
             margin-bottom: var(--spacing-2);
         }
 
-        .chatbot-subtitle {
-            font-size: var(--font-size-base);
-            opacity: 0.9;
+        .page-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--color-gray-600);
             margin-bottom: var(--spacing-4);
         }
 
-        .chatbot-status {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--spacing-2);
-            font-size: var(--font-size-sm);
-            background: rgba(255, 255, 255, 0.2);
-            padding: var(--spacing-2) var(--spacing-4);
-            border-radius: var(--border-radius-full);
+        .info-banner {
+            background: linear-gradient(135deg, var(--color-medical-primary), var(--color-medical-secondary));
+            color: var(--color-white);
+            padding: var(--spacing-4);
+            border-radius: var(--border-radius-xl);
+            font-weight: var(--font-weight-semibold);
         }
 
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--color-medical-success);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* 채팅 영역 */
-        .chat-area {
-            flex: 1;
-            overflow-y: auto;
+        /* 실습 가이드 카드 */
+        .guide-card {
+            background: var(--color-white);
             padding: var(--spacing-6);
-            background: var(--color-chat-background);
-            scroll-behavior: smooth;
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-6);
         }
 
-        .chat-messages {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-4);
+        .guide-title {
+            color: var(--color-medical-primary);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-4);
         }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-list li {
+            padding: var(--spacing-2) 0;
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+
+        .step-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* 링크 버튼 */
+        .nav-buttons {
+            display: flex;
+            gap: var(--spacing-4);
+            justify-content: center;
+            margin-top: var(--spacing-8);
+        }
+
+        .btn {
+            background: var(--color-medical-primary);
+            color: var(--color-white);
+            padding: var(--spacing-4) var(--spacing-6);
+            border-radius: var(--border-radius-xl);
+            text-decoration: none;
+            font-weight: var(--font-weight-semibold);
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--color-medical-secondary);
+        }
+
+        .btn-secondary {
+            background: var(--color-gray-600);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 페이지 헤더 -->
+        <header class="page-header">
+            <h1 class="page-title">🏥 을지대학교 의료IT 챗봇</h1>
+            <p class="page-subtitle">실습 프로젝트 Part 1: 기본 구조와 CSS 변수</p>
+            <div class="info-banner">
+                <strong>학습 목표:</strong> CSS 변수, 기본 리셋, 레이아웃 시스템 이해
+            </div>
+        </header>
+
+        <!-- 실습 가이드 -->
+        <main>
+            <div class="guide-card">
+                <h2 class="guide-title">📚 Part 1 학습 내용</h2>
+                <ul class="step-list">
+                    <li>✅ CSS 변수(Custom Properties) 활용법</li>
+                    <li>✅ 의료 시스템에 적합한 색상 팔레트 설계</li>
+                    <li>✅ 기본 리셋과 박스 모델 이해</li>
+                    <li>✅ 컨테이너 시스템과 반응형 기초</li>
+                    <li>✅ 타이포그래피 시스템 구축</li>
+                </ul>
+            </div>
+
+            <div class="guide-card">
+                <h2 class="guide-title">🎯 실습 과제</h2>
+                <ol class="step-list">
+                    <li><strong>1단계:</strong> CSS 변수를 수정해서 다른 색상 테마 만들기</li>
+                    <li><strong>2단계:</strong> --spacing 값들을 조정해서 간격 변화 확인</li>
+                    <li><strong>3단계:</strong> 새로운 CSS 변수 추가 (예: --color-accent)</li>
+                    <li><strong>4단계:</strong> 카드 컴포넌트에 호버 효과 추가</li>
+                </ol>
+            </div>
+
+            <div class="guide-card">
+                <h2 class="guide-title">💡 핵심 포인트</h2>
+                <ul class="step-list">
+                    <li><strong>CSS 변수:</strong> :root에서 정의하고 var()로 사용</li>
+                    <li><strong>네이밍:</strong> --color-, --spacing-, --font- 등 접두사 활용</li>
+                    <li><strong>유지보수:</strong> 한 곳에서 값 변경으로 전체 테마 변경 가능</li>
+                    <li><strong>의료 테마:</strong> 신뢰감과 안정감을 주는 블루 계열 사용</li>
+                </ul>
+            </div>
+        </main>
+
+        <!-- 내비게이션 -->
+        <nav class="nav-buttons">
+            <a href="10_medical_chatbot_project_part2.html" class="btn">Part 2: 챗봇 UI 구조 →</a>
+            <a href="README.md" class="btn btn-secondary">← 실습 가이드</a>
+        </nav>
+    </div>
+
+    <script>
+        // Part 1 JavaScript: 기본 상호작용
+        console.log('🏥 의료IT 챗봇 Part 1 로드됨');
+        console.log('CSS 변수들:', {
+            primary: getComputedStyle(document.documentElement).getPropertyValue('--color-medical-primary'),
+            spacing: getComputedStyle(document.documentElement).getPropertyValue('--spacing-4')
+        });
+
+        // 실습용: CSS 변수 동적 변경 예제
+        function changeTheme() {
+            document.documentElement.style.setProperty('--color-medical-primary', '#8b5cf6');
+            console.log('테마가 보라색으로 변경되었습니다!');
+        }
+
+        // 개발자 콘솔에서 changeTheme() 함수 실행해보기
+        window.changeTheme = changeTheme;
+    </script>
+</body>
+</html>

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>의료IT 챗봇 프로젝트 - Part 4: 완성본</title>
+    <style>
+        /* 완성된 의료 챗봇 스타일 */
+        :root {
+            --color-medical-primary: #006ba6;
+            --color-medical-secondary: #0496c7;
+            --color-medical-success: #2e8b57;
+            --color-medical-error: #dc2626;
+            --color-medical-warning: #ff6b35;
+            --color-chat-user: #4f46e5;
+            --color-chat-bot: #10b981;
+            --color-chat-background: #f8fafc;
+            --color-white: #ffffff;
+            --color-gray-100: #f3f4f6;
+            --color-gray-200: #e5e7eb;
+            --color-gray-600: #4b5563;
+            --color-gray-900: #111827;
+            --font-family-medical: 'Malgun Gothic', sans-serif;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-4xl: 2.25rem;
+            --font-weight-normal: 400;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --spacing-2: 0.5rem;
+            --spacing-4: 1rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            --border-radius-xl: 0.75rem;
+            --border-radius-2xl: 1rem;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-medical);
+            color: var(--color-gray-900);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--spacing-6);
+        }
+
+        .chatbot-container {
+            background: var(--color-white);
+            border-radius: var(--border-radius-2xl);
+            box-shadow: var(--shadow-2xl);
+            overflow: hidden;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--color-medical-primary), var(--color-medical-secondary));
+            color: var(--color-white);
+            padding: var(--spacing-6);
+            text-align: center;
+            position: relative;
+        }
+
+        .chatbot-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ffb700, var(--color-medical-success));
+        }
+
+        .chatbot-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .chatbot-subtitle {
+            font-size: var(--font-size-base);
+            opacity: 0.9;
+            margin-bottom: var(--spacing-4);
+        }
+
+        .chatbot-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            font-size: 0.875rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: var(--spacing-2) var(--spacing-4);
+            border-radius: 9999px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-medical-success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-6);
+            background: var(--color-chat-background);
+        }
+
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-4);
+        }
+
+        .message {
+            display: flex;
+            gap: var(--spacing-4);
+            max-width: 70%;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message.system {
+            align-self: center;
+            background: var(--color-gray-100);
+            padding: var(--spacing-2) var(--spacing-4);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: var(--color-gray-600);
+            max-width: none;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-semibold);
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: var(--color-chat-user);
+            color: var(--color-white);
+        }
+
+        .message.bot .message-avatar {
+            background: var(--color-chat-bot);
+            color: var(--color-white);
+        }
+
+        .message-content {
+            background: var(--color-white);
+            padding: var(--spacing-4);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-gray-200);
+        }
+
+        .message.user .message-content {
+            background: var(--color-chat-user);
+            color: var(--color-white);
+            border-color: var(--color-chat-user);
+        }
+
+        .message.bot .message-content {
+            background: var(--color-white);
+            border-color: var(--color-chat-bot);
+            border-left-width: 4px;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--color-gray-600);
+            margin-top: var(--spacing-2);
+        }
+
+        .chat-input-container {
+            padding: var(--spacing-4) var(--spacing-6);
+            background: var(--color-white);
+            border-top: 1px solid var(--color-gray-200);
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: var(--spacing-4);
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: var(--spacing-4);
+            border: 2px solid var(--color-gray-200);
+            border-radius: var(--border-radius-xl);
+            font-size: var(--font-size-base);
+            resize: none;
+            min-height: 60px;
+            max-height: 120px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--color-medical-primary);
+            box-shadow: 0 0 0 3px rgba(0, 107, 166, 0.1);
+        }
+
+        .send-button {
+            background: var(--color-medical-primary);
+            color: var(--color-white);
+            border: none;
+            padding: var(--spacing-4) var(--spacing-6);
+            border-radius: var(--border-radius-xl);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 60px;
+        }
+
+        .send-button:hover {
+            background: var(--color-medical-secondary);
+            transform: translateY(-1px);
+        }
+
+        .send-button:disabled {
+            background: var(--color-gray-200);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quick-replies {
+            display: flex;
+            gap: var(--spacing-2);
+            flex-wrap: wrap;
+            margin-top: var(--spacing-4);
+        }
+
+        .quick-reply-btn {
+            background: var(--color-gray-100);
+            border: 1px solid var(--color-gray-200);
+            padding: var(--spacing-2) var(--spacing-4);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-reply-btn:hover {
+            background: var(--color-medical-primary);
+            color: var(--color-white);
+            border-color: var(--color-medical-primary);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: var(--spacing-4);
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-gray-600);
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes typingAnimation {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 의료 정보 카드 */
+        .medical-card {
+            background: var(--color-white);
+            border-radius: var(--border-radius-xl);
+            padding: var(--spacing-6);
+            box-shadow: var(--shadow-md);
+            margin: var(--spacing-4) 0;
+            border-left: 4px solid var(--color-medical-primary);
+        }
+
+        .medical-card.priority-high {
+            border-left-color: var(--color-medical-error);
+        }
+
+        .medical-card.priority-medium {
+            border-left-color: var(--color-medical-warning);
+        }
+
+        .medical-card.priority-low {
+            border-left-color: var(--color-medical-success);
+        }
+
+        .medical-card-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-2);
+            color: var(--color-gray-900);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--spacing-8);
+        }
+
+        .page-title {
+            font-size: var(--font-size-4xl);
+            color: var(--color-medical-primary);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .page-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--color-gray-600);
+            margin-bottom: var(--spacing-4);
+        }
+
+        .info-banner {
+            background: linear-gradient(135deg, var(--color-medical-primary), var(--color-medical-secondary));
+            color: var(--color-white);
+            padding: var(--spacing-4);
+            border-radius: var(--border-radius-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--spacing-4);
+            }
+            
+            .chatbot-container {
+                height: 90vh;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 페이지 헤더 -->
+        <header class="page-header">
+            <h1 class="page-title">🏥 을지대학교 의료IT 챗봇</h1>
+            <p class="page-subtitle">완성된 AI 의료 상담 서비스</p>
+            <div class="info-banner">
+                <strong>실습 완료!</strong> HTML, CSS, JavaScript를 활용한 의료 챗봇 프로젝트
+            </div>
+        </header>
+
+        <!-- 완성된 챗봇 -->
+        <div class="chatbot-container">
+            <div class="chatbot-header">
+                <h2 class="chatbot-title">🤖 MediBot AI</h2>
+                <p class="chatbot-subtitle">을지대학교 의료IT 전공 개발 챗봇</p>
+                <div class="chatbot-status">
+                    <div class="status-indicator"></div>
+                    온라인 상태
+                </div>
+            </div>
+
+            <div class="chat-area" id="chatArea">
+                <div class="chat-messages" id="chatMessages">
+                    <!-- 시스템 환영 메시지 -->
+                    <div class="message system">
+                        <div class="message-content">
+                            안녕하세요! 을지대학교 의료IT 챗봇에 오신 것을 환영합니다. 🏥
+                        </div>
+                    </div>
+
+                    <!-- 봇 초기 메시지 -->
+                    <div class="message bot">
+                        <div class="message-avatar">🤖</div>
+                        <div>
+                            <div class="message-content">
+                                반갑습니다! 저는 을지대학교 의료IT 팀에서 개발한 AI 의료 상담 봇입니다.<br><br>
+                                
+                                제공 서비스:<br>
+                                • 🩺 증상 기반 의료 정보<br>
+                                • 💊 약물 복용법 안내<br>
+                                • 🚨 응급상황 대처법<br>
+                                • 📋 건강검진 가이드<br><br>
+                                
+                                궁금한 점을 입력하시거나 아래 버튼을 클릭해주세요!
+                            </div>
+                            <div class="message-time" id="initialTime"></div>
+                            
+                            <div class="quick-replies">
+                                <button class="quick-reply-btn" onclick="sendQuickReply('두통이 심해요')">🤕 두통 증상</button>
+                                <button class="quick-reply-btn" onclick="sendQuickReply('복용 중인 약물 확인')">💊 복용약 확인</button>
+                                <button class="quick-reply-btn" onclick="sendQuickReply('응급상황 대처법')">🚨 응급상황</button>
+                                <button class="quick-reply-btn" onclick="sendQuickReply('건강검진 일정')">📅 검진 일정</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <form class="chat-input-form" id="chatForm">
+                    <textarea 
+                        class="chat-input" 
+                        id="chatInput" 
+                        placeholder="증상이나 궁금한 점을 입력해주세요..." 
+                        rows="1"></textarea>
+                    <button type="submit" class="send-button" id="sendButton">
+                        📤 전송
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 추가 정보 -->
+        <div style="margin-top: var(--spacing-8);">
+            <div class="medical-card priority-high">
+                <h3 class="medical-card-title">🚨 응급상황 안내</h3>
+                <p>심각한 증상(의식잃음, 심한 흉통, 호흡곤란 등)이 있으시면 즉시 119에 신고하거나 응급실로 내원하세요.</p>
+            </div>
+
+            <div class="medical-card priority-medium">
+                <h3 class="medical-card-title">💡 챗봇 사용 안내</h3>
+                <p>본 챗봇은 의료 정보 제공 목적으로, 정확한 진단은 의료진과 상담하시기 바랍니다.</p>
+            </div>
+
+            <div class="medical-card priority-low">
+                <h3 class="medical-card-title">🎓 을지대학교 의료IT 프로젝트</h3>
+                <p>제작: 안건 (의료IT 전공) | HTML, CSS, JavaScript 종합 실습 프로젝트</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 완성된 의료 챗봇 JavaScript
+        console.log('🏥 을지대학교 의료IT 챗봇 - 완성본 시작');
+
+        // DOM 요소 참조
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatArea = document.getElementById('chatArea');
+        const sendButton = document.getElementById('sendButton');
+        const initialTime = document.getElementById('initialTime');
+
+        // 초기 시간 설정
+        initialTime.textContent = getCurrentTime();
+
+        // 종합 의료 응답 데이터베이스
+        const medicalResponses = {
+            '두통': {
+                response: '두통의 원인과 대처법을 안내해드리겠습니다:\n\n🔍 주요 원인:\n• 스트레스와 피로\n• 수면 부족 (6시간 미만)\n• 탈수 (하루 1.5L 미만 수분 섭취)\n• 목과 어깨 근육 긴장\n• 눈의 피로 (장시간 화면 시청)\n• 혈당 변화 (공복 또는 과식)\n\n💡 즉시 시도할 수 있는 대처법:\n• 충분한 휴식 (어둡고 조용한 곳)\n• 수분 섭취 (따뜻한 물 1-2잔)\n• 목과 어깨 부드러운 마사지\n• 냉찜질 (15분) 또는 온찜질 (20분)\n• 가벼운 목 스트레칭\n\n⚠️ 즉시 병원 방문이 필요한 경우:\n• 갑작스럽고 극심한 두통\n• 발열(38°C 이상)을 동반한 두통\n• 시야 장애나 복시\n• 의식 저하나 혼돈\n• 목 경직\n• 구토를 동반한 지속적 두통',
+                quickReplies: ['진통제 복용법', '두통 예방법', '스트레스 관리']
+            },
+            '복용약': {
+                response: '💊 안전한 약물 복용을 위한 종합 가이드:\n\n📋 복용 전 필수 확인사항:\n• 의사 처방에 따른 정확한 용법·용량\n• 본인의 약물 알레르기 여부\n• 현재 복용 중인 다른 약물\n• 식사와의 관계 (식전 30분/식후 30분)\n• 유효기간 및 보관 상태\n\n⏰ 올바른 복용 방법:\n• 정해진 시간에 규칙적으로\n• 충분한 양의 물과 함께\n• 놓친 경우: 다음 복용시간이 가깝지 않으면 즉시 복용\n• 절대 임의로 용량 조절하지 말 것\n\n🚫 금지사항:\n• 다른 사람과 약물 공유\n• 술과 함께 복용\n• 임의로 복용 중단\n• 유효기간 지난 약물 복용\n\n⚠️ 즉시 의료진 상담이 필요한 경우:\n• 예상치 못한 부작용 발생\n• 알레르기 반응 (발진, 가려움, 호흡곤란)\n• 효과가 전혀 없는 경우\n• 다른 약물과의 상호작용 의심',
+                quickReplies: ['부작용 대처법', '약물 상호작용', '보관 방법']
+            },
+            '응급상황': {
+                response: '🚨 응급상황 대처법 - 생명을 구하는 정보:\n\n📞 즉시 119 신고가 필요한 상황:\n• 의식을 잃었을 때\n• 심한 흉통이나 호흡곤란\n• 대량 출혈 (멈추지 않는 출혈)\n• 심한 외상 (골절, 심한 타박상)\n• 중독이 의심될 때\n• 경련 발작\n• 심한 화상 (2도 이상)\n• 질식 또는 익사\n\n🏥 응급처치 기본 원칙:\n• 환자와 구조자의 안전 먼저 확보\n• 의식 상태 확인 (어깨를 가볍게 두드리며 "괜찮으세요?" 물어보기)\n• 호흡과 맥박 확인\n• 출혈 시 깨끗한 천으로 압박 지혈\n• 환자를 따뜻하게 유지\n• 가능한 한 환자를 움직이지 말 것\n\n💓 심폐소생술 (CPR) 기본:\n1. 양손으로 가슴 중앙 압박\n2. 분당 100-120회 속도\n3. 5cm 깊이로 압박\n4. 30회 압박 후 2회 인공호흡\n\n⚠️ 절대 금지사항:\n• 의식 잃은 환자에게 물이나 약 주기\n• 척추 손상 의심 시 무리한 이동\n• 화상 부위에 얼음이나 기름 바르기',
+                quickReplies: ['심폐소생술 상세', '응급실 위치', '응급약품 준비']
+            },
+            '건강검진': {
+                response: '📅 건강검진 완벽 가이드:\n\n🔍 연령별 필수 검진 항목:\n\n20-30대:\n• 기본 건강검진 (2년마다)\n• 혈압, 혈당, 콜레스테롤\n• 간 기능 검사\n• 흉부 X선\n• 요검사\n\n40대:\n• 종합검진 (매년)\n• 위내시경 (2년마다)\n• 간염 검사\n• 갑상선 기능 검사\n• 골밀도 검사 (여성)\n\n50대 이상:\n• 대장내시경 (5년마다)\n• 유방촬영술 (여성, 2년마다)\n• 자궁경부암 검사 (여성, 2년마다)\n• 전립선암 검사 (남성)\n• 심장 정밀검사\n\n💡 검진 전 준비사항:\n• 12시간 이상 금식 (물 제외)\n• 편안하고 탈의하기 쉬운 복장\n• 현재 복용 중인 약물 리스트\n• 과거 검진 결과지 지참\n• 가족력 정보 준비\n\n📋 검진 후 관리:\n• 결과 상담 예약\n• 이상 소견 시 추가 검사\n• 정기적인 추적 관찰\n• 생활습관 개선 계획',
+                quickReplies: ['검진 예약', '비용 문의', '결과 해석']
+            }
+        };
+
+        // 현재 시간 반환
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString('ko-KR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+
+        // 메시지 추가 함수
+        function addMessage(content, sender = 'bot', showQuickReplies = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            if (sender === 'system') {
+                messageDiv.innerHTML = `
+                    <div class="message-content">${content}</div>
+                `;
+            } else {
+                const avatar = sender === 'user' ? '👤' : '🤖';
+                let quickReplyHTML = '';
+                
+                if (showQuickReplies && showQuickReplies.length > 0) {
+                    quickReplyHTML = `
+                        <div class="quick-replies">
+                            ${showQuickReplies.map(reply => 
+                                `<button class="quick-reply-btn" onclick="sendQuickReply('${reply}')">${reply}</button>`
+                            ).join('')}
+                        </div>
+                    `;
+                }
+                
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">${avatar}</div>
+                    <div>
+                        <div class="message-content">${content.replace(/\n/g, '<br>')}</div>
+                        <div class="message-time">${getCurrentTime()}</div>
+                        ${quickReplyHTML}
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // 타이핑 인디케이터
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot typing-message';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            return typingDiv;
+        }
+
+        function removeTypingIndicator(element) {
+            if (element && element.parentNode) {
+                element.parentNode.removeChild(element);
+            }
+        }
+
+        // 지능형 응답 생성
+        function generateResponse(message) {
+            const lowercaseMessage = message.toLowerCase();
+            
+            // 키워드 매칭
+            for (const [keyword, data] of Object.entries(medicalResponses)) {
+                if (lowercaseMessage.includes(keyword.toLowerCase())) {
+                    return data;
+                }
+            }
+            
+            // 증상 관련 키워드
+            if (lowercaseMessage.includes('아프') || lowercaseMessage.includes('통증') || lowercaseMessage.includes('아픔')) {
+                return {
+                    response: '통증이 있으시는군요. 😟\n\n구체적으로 어떤 부위가 아프신지, 언제부터 아프셨는지 알려주시면 더 정확한 정보를 제공해드릴 수 있습니다.\n\n일반적인 통증 완화 방법:\n• 충분한 휴식과 수면\n• 냉찜질 (급성 통증) 또는 온찜질 (만성 통증)\n• 가벼운 스트레칭과 운동\n• 적절한 진통제 복용\n• 스트레스 관리\n\n⚠️ 다음의 경우 즉시 병원 방문:\n• 극심하거나 갑작스러운 통증\n• 일주일 이상 지속되는 통증\n• 발열이나 다른 증상을 동반\n• 일상생활에 심각한 지장',
+                    quickReplies: ['두통 증상', '근육통 완화', '관절 통증']
+                };
+            }
+            
+            if (lowercaseMessage.includes('감사') || lowercaseMessage.includes('고마') || lowercaseMessage.includes('도움')) {
+                return {
+                    response: '도움이 되어서 정말 기쁩니다! 😊\n\n건강한 생활을 위한 추가 조언:\n• 규칙적인 운동 (주 150분 이상)\n• 균형 잡힌 식사 (야채, 과일, 단백질)\n• 충분한 수면 (7-8시간)\n• 정기적인 건강검진\n• 스트레스 관리\n• 금연 및 절주\n\n언제든지 건강 관련 궁금한 점이 있으시면 편하게 물어보세요!\n\n⚠️ 응급상황에서는 119로 즉시 연락하시기 바랍니다.',
+                    quickReplies: ['건강관리 팁', '운동 추천', '식단 상담']
+                };
+            }
+            
+            // 기본 응답
+            return {
+                response: '안녕하세요! 을지대학교 의료IT 챗봇입니다. 🏥\n\n저는 다음과 같은 도움을 드릴 수 있습니다:\n\n🩺 증상 관련 정보 제공\n💊 약물 복용 상담\n🚨 응급상황 대처법\n📅 건강검진 가이드\n🏥 의료 정보 안내\n\n구체적인 증상이나 궁금한 점을 말씀해주시면 더 정확하고 상세한 정보를 제공해드리겠습니다.\n\n⚠️ 본 챗봇은 정보 제공 목적이며, 정확한 진단과 치료는 의료진과 상담하시기 바랍니다.',
+                quickReplies: ['두통 증상', '복용약 확인', '응급상황', '건강검진']
+            };
+        }
+
+        // 메시지 전송
+        function sendMessage(message) {
+            if (!message.trim()) return;
+            
+            addMessage(message, 'user');
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            sendButton.disabled = true;
+            
+            const typingIndicator = showTypingIndicator();
+            const delay = Math.random() * 1500 + 1000;
+            
+            setTimeout(() => {
+                removeTypingIndicator(typingIndicator);
+                const responseData = generateResponse(message);
+                addMessage(responseData.response, 'bot', responseData.quickReplies);
+                sendButton.disabled = false;
+                chatInput.focus();
+            }, delay);
+        }
+
+        // 빠른 응답
+        function sendQuickReply(message) {
+            sendMessage(message);
+        }
+
+        // 이벤트 리스너
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = chatInput.value.trim();
+            if (message) {
+                sendMessage(message);
+            }
+        });
+
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const message = chatInput.value.trim();
+                if (message) {
+                    sendMessage(message);
+                }
+            }
+        });
+
+        // 키보드 단축키
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key === 'i') {
+                e.preventDefault();
+                chatInput.focus();
+            }
+            if (e.altKey && e.key === 's') {
+                e.preventDefault();
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
+        });
+
+        // 초기화
+        console.log('✅ 을지대학교 의료IT 챗봇 완성본 로드 완료');
+        console.log('📚 제작: 안건 (의료IT 전공)');
+        console.log('🎯 기능: HTML, CSS, JavaScript 종합 실습');
+        chatInput.focus();
+    </script>
+</body>
+</html>

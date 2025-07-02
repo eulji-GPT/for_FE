@@ -3,20 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>의료IT 챗봇 프로젝트 - 종합 실습 (Part 2 - JavaScript 기능)</title>
+    <title>챗봇 프로젝트 - Part 2: 챗봇 UI 구조</title>
     <style>
-        /* Part 1에서 이어지는 스타일 */
+        /* Part 1에서 만든 CSS 변수 재사용 */
         :root {
             --color-medical-primary: #006ba6;
             --color-medical-secondary: #0496c7;
-            --color-medical-accent: #ffb700;
             --color-medical-success: #2e8b57;
-            --color-medical-warning: #ff6b35;
             --color-medical-error: #dc2626;
             --color-chat-user: #4f46e5;
             --color-chat-bot: #10b981;
-            --color-chat-system: #6b7280;
             --color-chat-background: #f8fafc;
+            --color-white: #ffffff;
+            --color-gray-100: #f3f4f6;
+            --color-gray-200: #e5e7eb;
+            --color-gray-600: #4b5563;
+            --color-gray-900: #111827;
+            --font-family-medical: 'Malgun Gothic', sans-serif;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-4xl: 2.25rem;
+            --font-weight-normal: 400;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --spacing-2: 0.5rem;
+            --spacing-4: 1rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            --border-radius-xl: 0.75rem;
+            --border-radius-2xl: 1rem;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
         /* JavaScript 기능을 위한 추가 스타일 */
@@ -355,7 +374,7 @@
         <header class="chat-header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1 class="header-title">🏥 을지대 의료IT 챗봇</h1>
+                    <h1 class="header-title">🏥 을지대 챗봇</h1>
                     <p class="header-subtitle">GPT 기반 의료정보 어시스턴트</p>
                 </div>
                 <div class="header-right">
@@ -383,7 +402,7 @@
                 <div class="chat-area" id="chatArea">
                     <div class="message system">
                         <div class="message-bubble">
-                            안녕하세요! 을지대학교 의료IT 챗봇입니다. 🏥<br>
+                            안녕하세요! 을지대학교 챗봇입니다. 🏥<br>
                             의료 정보, 건강 상담, 병원 안내 등 궁금한 것이 있으시면 언제든지 물어보세요!
                         </div>
                     </div>
